@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/v1/memory.schema.json",
+  "title": "KITT Memory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "namespace",
+    "workspace_id",
+    "kind",
+    "content",
+    "sensitivity",
+    "scope",
+    "importance",
+    "confidence",
+    "pinned",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "workspace_id": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "user_preference",
+        "project_rule",
+        "architecture_decision",
+        "technical_fact",
+        "working_pattern",
+        "failed_approach",
+        "open_issue",
+        "project_state",
+        "episodic",
+        "personal_fact",
+        "routine"
+      ]
+    },
+    "content": {
+      "type": "string"
+    },
+    "sensitivity": {
+      "enum": [
+        "public",
+        "personal",
+        "private",
+        "secret",
+        "ephemeral"
+      ]
+    },
+    "scope": {
+      "enum": [
+        "global",
+        "workspace",
+        "conversation"
+      ]
+    },
+    "importance": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "pinned": {
+      "type": "boolean"
+    },
+    "created_at": {
+      "type": "integer"
+    },
+    "updated_at": {
+      "type": "integer"
+    }
+  }
+}

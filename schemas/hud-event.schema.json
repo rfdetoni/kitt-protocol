@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/v1/hud-event.schema.json",
+  "title": "HUD Event",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "state"
+      ],
+      "properties": {
+        "type": {
+          "const": "status"
+        },
+        "state": {
+          "enum": [
+            "listening",
+            "thinking",
+            "responding",
+            "executing",
+            "error"
+          ]
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "content",
+        "ttl_ms"
+      ],
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+        "content": {
+          "type": "string"
+        },
+        "ttl_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "src",
+        "ttl_ms"
+      ],
+      "properties": {
+        "type": {
+          "const": "image"
+        },
+        "src": {
+          "type": "string"
+        },
+        "alt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ttl_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "const": "hide"
+        }
+      }
+    }
+  ]
+}
