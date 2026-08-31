@@ -26,6 +26,16 @@ export const KINDS = {
   HUD_EVENT: "hud.event",
   WORKER_EXECUTE_REQUEST: "worker.execute.request",
   WORKER_EXECUTE_RESPONSE: "worker.execute.response",
+  SETTINGS_CATALOG_REQUEST: "settings.catalog.request",
+  SETTINGS_CATALOG_RESPONSE: "settings.catalog.response",
+  SETTINGS_SNAPSHOT_REQUEST: "settings.snapshot.request",
+  SETTINGS_SNAPSHOT_RESPONSE: "settings.snapshot.response",
+  SETTINGS_VALIDATE_REQUEST: "settings.validate.request",
+  SETTINGS_VALIDATE_RESPONSE: "settings.validate.response",
+  SETTINGS_APPLY_REQUEST: "settings.apply.request",
+  SETTINGS_APPLY_RESPONSE: "settings.apply.response",
+  SETTINGS_HEALTH_REQUEST: "settings.health.request",
+  SETTINGS_HEALTH_RESPONSE: "settings.health.response",
 } as const;
 
 export type ModelRoute = "auto" | "fast" | "heavy";

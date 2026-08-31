@@ -36,6 +36,16 @@ pub mod kinds {
     pub const HUD_EVENT: &str = "hud.event";
     pub const WORKER_EXECUTE_REQUEST: &str = "worker.execute.request";
     pub const WORKER_EXECUTE_RESPONSE: &str = "worker.execute.response";
+    pub const SETTINGS_CATALOG_REQUEST: &str = "settings.catalog.request";
+    pub const SETTINGS_CATALOG_RESPONSE: &str = "settings.catalog.response";
+    pub const SETTINGS_SNAPSHOT_REQUEST: &str = "settings.snapshot.request";
+    pub const SETTINGS_SNAPSHOT_RESPONSE: &str = "settings.snapshot.response";
+    pub const SETTINGS_VALIDATE_REQUEST: &str = "settings.validate.request";
+    pub const SETTINGS_VALIDATE_RESPONSE: &str = "settings.validate.response";
+    pub const SETTINGS_APPLY_REQUEST: &str = "settings.apply.request";
+    pub const SETTINGS_APPLY_RESPONSE: &str = "settings.apply.response";
+    pub const SETTINGS_HEALTH_REQUEST: &str = "settings.health.request";
+    pub const SETTINGS_HEALTH_RESPONSE: &str = "settings.health.response";
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
