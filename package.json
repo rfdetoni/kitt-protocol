@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "typecheck": "tsc -p sdk/typescript/tsconfig.json --noEmit",
     "test": "tsc -p sdk/typescript/tsconfig.json --noEmit && node scripts/validate-fixtures.mjs"
   },
   "devDependencies": {

@@ -7,6 +7,10 @@ export const KINDS = {
   SYSTEM_ERROR: "system.error",
   ASSISTANT_ASK_REQUEST: "assistant.ask.request",
   ASSISTANT_ASK_RESPONSE: "assistant.ask.response",
+  ASSISTANT_ASK_ROUTED_REQUEST: "assistant.ask_routed.request",
+  ASSISTANT_ASK_ROUTED_RESPONSE: "assistant.ask_routed.response",
+  ASSISTANT_TRANSCRIBE_REQUEST: "assistant.transcribe.request",
+  ASSISTANT_TRANSCRIBE_RESPONSE: "assistant.transcribe.response",
   ASSISTANT_REMEMBER_REQUEST: "assistant.remember.request",
   ASSISTANT_REMEMBER_RESPONSE: "assistant.remember.response",
   MEMORY_REMEMBER_REQUEST: "memory.remember.request",
@@ -23,6 +27,13 @@ export const KINDS = {
   WORKER_EXECUTE_REQUEST: "worker.execute.request",
   WORKER_EXECUTE_RESPONSE: "worker.execute.response",
 } as const;
+
+export type ModelRoute = "auto" | "fast" | "heavy";
+export type ModelTier = "fast" | "heavy";
+export interface RoutedAskRequest { text: string; locale?: string | null; route?: ModelRoute; show_hud?: boolean; }
+export interface RoutedAskResponse { text: string; tier: ModelTier; fallback_used?: boolean; }
+export interface TranscribeRequest { path: string; locale?: string | null; show_hud?: boolean; }
+export interface TranscribeResponse { text: string; }
 
 export type HudState = "listening" | "thinking" | "responding" | "executing" | "error";
 export type HudEvent =

@@ -2,6 +2,12 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
+mod multillm;
+pub use multillm::{
+    ModelRoute, ModelTier, RoutedAskRequest, RoutedAskResponse, TranscribeRequest,
+    TranscribeResponse,
+};
+
 pub const PROTOCOL_VERSION: u16 = 1;
 pub const MAX_FRAME_BYTES: usize = 1024 * 1024;
 
@@ -11,6 +17,10 @@ pub mod kinds {
     pub const SYSTEM_ERROR: &str = "system.error";
     pub const ASSISTANT_ASK_REQUEST: &str = "assistant.ask.request";
     pub const ASSISTANT_ASK_RESPONSE: &str = "assistant.ask.response";
+    pub const ASSISTANT_ASK_ROUTED_REQUEST: &str = "assistant.ask_routed.request";
+    pub const ASSISTANT_ASK_ROUTED_RESPONSE: &str = "assistant.ask_routed.response";
+    pub const ASSISTANT_TRANSCRIBE_REQUEST: &str = "assistant.transcribe.request";
+    pub const ASSISTANT_TRANSCRIBE_RESPONSE: &str = "assistant.transcribe.response";
     pub const ASSISTANT_REMEMBER_REQUEST: &str = "assistant.remember.request";
     pub const ASSISTANT_REMEMBER_RESPONSE: &str = "assistant.remember.response";
     pub const MEMORY_REMEMBER_REQUEST: &str = "memory.remember.request";

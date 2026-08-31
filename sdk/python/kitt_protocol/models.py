@@ -13,6 +13,10 @@ SYSTEM_PING_RESPONSE = "system.ping.response"
 SYSTEM_ERROR = "system.error"
 ASSISTANT_ASK_REQUEST = "assistant.ask.request"
 ASSISTANT_ASK_RESPONSE = "assistant.ask.response"
+ASSISTANT_ASK_ROUTED_REQUEST = "assistant.ask_routed.request"
+ASSISTANT_ASK_ROUTED_RESPONSE = "assistant.ask_routed.response"
+ASSISTANT_TRANSCRIBE_REQUEST = "assistant.transcribe.request"
+ASSISTANT_TRANSCRIBE_RESPONSE = "assistant.transcribe.response"
 ASSISTANT_REMEMBER_REQUEST = "assistant.remember.request"
 ASSISTANT_REMEMBER_RESPONSE = "assistant.remember.response"
 MEMORY_REMEMBER_REQUEST = "memory.remember.request"
@@ -183,3 +187,30 @@ class MemoryForgetRequest:
 class WorkerExecuteRequest:
     capability: str
     payload: dict[str, Any]
+
+
+@dataclass(frozen=True)
+class RoutedAskRequest:
+    text: str
+    locale: str | None = None
+    route: str = "auto"
+    show_hud: bool = True
+
+
+@dataclass(frozen=True)
+class RoutedAskResponse:
+    text: str
+    tier: str
+    fallback_used: bool = False
+
+
+@dataclass(frozen=True)
+class TranscribeRequest:
+    path: str
+    locale: str | None = None
+    show_hud: bool = True
+
+
+@dataclass(frozen=True)
+class TranscribeResponse:
+    text: str
