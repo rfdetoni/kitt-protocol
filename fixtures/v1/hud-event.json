@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "id": "evt-hud-001",
+  "kind": "hud.event",
+  "payload": {
+    "type": "text",
+    "content": "Ready",
+    "ttl_ms": 1000
+  }
+}

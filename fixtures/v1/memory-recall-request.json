@@ -1,0 +1,16 @@
+{
+  "token": "fixture-token",
+  "envelope": {
+    "version": 1,
+    "id": "req-memory-001",
+    "kind": "memory.recall.request",
+    "payload": {
+      "namespace": "agent-cli",
+      "workspace_id": "ws-1",
+      "query": "architecture",
+      "limit": 8,
+      "allow_private": true,
+      "allow_secret": false
+    }
+  }
+}

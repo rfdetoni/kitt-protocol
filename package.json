@@ -1,1 +1,16 @@
-{"name":"@kitt/protocol","version":"0.1.0","private":true,"type":"module","scripts":{"test":"tsc -p sdk/typescript/tsconfig.json --noEmit"},"devDependencies":{"typescript":"^5.7.0"},"types":"./sdk/typescript/src/index.ts","exports":{".":"./sdk/typescript/src/index.ts"}}
+{
+  "name": "@kitt/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsc -p sdk/typescript/tsconfig.json --noEmit && node scripts/validate-fixtures.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  },
+  "types": "./sdk/typescript/src/index.ts",
+  "exports": {
+    ".": "./sdk/typescript/src/index.ts"
+  }
+}

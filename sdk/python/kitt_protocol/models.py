@@ -1,33 +1,154 @@
 from __future__ import annotations
-from dataclasses import asdict, dataclass
-from typing import Any, Optional
-import json, uuid
+
+from dataclasses import asdict, dataclass, field
+from typing import Any
+import json
+import uuid
 
 PROTOCOL_VERSION = 1
+MAX_FRAME_BYTES = 1024 * 1024
+
+SYSTEM_PING_REQUEST = "system.ping.request"
+SYSTEM_PING_RESPONSE = "system.ping.response"
+SYSTEM_ERROR = "system.error"
+ASSISTANT_ASK_REQUEST = "assistant.ask.request"
+ASSISTANT_ASK_RESPONSE = "assistant.ask.response"
+ASSISTANT_REMEMBER_REQUEST = "assistant.remember.request"
+ASSISTANT_REMEMBER_RESPONSE = "assistant.remember.response"
+MEMORY_REMEMBER_REQUEST = "memory.remember.request"
+MEMORY_REMEMBER_RESPONSE = "memory.remember.response"
+MEMORY_RECALL_REQUEST = "memory.recall.request"
+MEMORY_RECALL_RESPONSE = "memory.recall.response"
+MEMORY_FORGET_REQUEST = "memory.forget.request"
+MEMORY_FORGET_RESPONSE = "memory.forget.response"
+HUD_SUBSCRIBE_REQUEST = "hud.subscribe.request"
+HUD_SUBSCRIBE_RESPONSE = "hud.subscribe.response"
+HUD_IMAGE_REQUEST = "hud.image.request"
+HUD_IMAGE_RESPONSE = "hud.image.response"
+HUD_EVENT = "hud.event"
+WORKER_EXECUTE_REQUEST = "worker.execute.request"
+WORKER_EXECUTE_RESPONSE = "worker.execute.response"
+
+
+class ProtocolError(ValueError):
+    pass
+
+
+def _ensure_object(value: Any, name: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ProtocolError(f"{name} must be a JSON object")
+    return value
+
 
 @dataclass(frozen=True)
 class Envelope:
     kind: str
-    payload: dict[str, Any]
-    id: str = ""
+    payload: Any
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    correlation_id: str | None = None
     version: int = PROTOCOL_VERSION
 
     def __post_init__(self) -> None:
-        if not self.id:
-            object.__setattr__(self, "id", str(uuid.uuid4()))
+        if self.version != PROTOCOL_VERSION:
+            raise ProtocolError(
+                f"unsupported protocol version {self.version}; expected {PROTOCOL_VERSION}"
+            )
+        if not isinstance(self.id, str) or not self.id.strip():
+            raise ProtocolError("envelope id is empty")
+        if not isinstance(self.kind, str) or not self.kind.strip():
+            raise ProtocolError("envelope kind is empty")
+        if self.correlation_id is not None and (
+            not isinstance(self.correlation_id, str) or not self.correlation_id.strip()
+        ):
+            raise ProtocolError("correlation_id cannot be empty")
 
     def dumps(self) -> str:
-        return json.dumps(asdict(self), ensure_ascii=False, separators=(",", ":"))
+        data = asdict(self)
+        if self.correlation_id is None:
+            data.pop("correlation_id")
+        return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+
+    @classmethod
+    def loads(cls, raw: str | bytes) -> "Envelope":
+        encoded = raw.encode("utf-8") if isinstance(raw, str) else raw
+        if len(encoded) > MAX_FRAME_BYTES:
+            raise ProtocolError("frame_too_large")
+        try:
+            data = _ensure_object(json.loads(encoded), "envelope")
+        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            raise ProtocolError(f"invalid_json: {exc}") from exc
+        allowed = {"version", "id", "kind", "correlation_id", "payload"}
+        required = {"version", "id", "kind", "payload"}
+        unknown = set(data) - allowed
+        missing = required - set(data)
+        if unknown:
+            raise ProtocolError(f"unknown envelope fields: {sorted(unknown)}")
+        if missing:
+            raise ProtocolError(f"missing envelope fields: {sorted(missing)}")
+        return cls(
+            version=data["version"],
+            id=data["id"],
+            kind=data["kind"],
+            correlation_id=data.get("correlation_id"),
+            payload=data["payload"],
+        )
+
+    @classmethod
+    def response(cls, kind: str, request_id: str, payload: Any) -> "Envelope":
+        return cls(kind=kind, payload=payload, correlation_id=request_id)
+
+    @classmethod
+    def error(cls, request_id: str | None, code: str, message: str) -> "Envelope":
+        return cls(
+            kind=SYSTEM_ERROR,
+            correlation_id=request_id,
+            payload={"code": code, "message": message},
+        )
+
+
+@dataclass(frozen=True)
+class AuthenticatedFrame:
+    envelope: Envelope
+    token: str = field(repr=False)
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.token, str) or not self.token.strip():
+            raise ProtocolError("authentication token is empty")
+
+    def dumps(self) -> str:
+        return json.dumps(
+            {"token": self.token, "envelope": json.loads(self.envelope.dumps())},
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+
+    @classmethod
+    def loads(cls, raw: str | bytes) -> "AuthenticatedFrame":
+        encoded = raw.encode("utf-8") if isinstance(raw, str) else raw
+        if len(encoded) > MAX_FRAME_BYTES:
+            raise ProtocolError("frame_too_large")
+        try:
+            data = _ensure_object(json.loads(encoded), "authenticated frame")
+        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            raise ProtocolError(f"invalid_json: {exc}") from exc
+        if set(data) != {"token", "envelope"}:
+            raise ProtocolError("authenticated frame must contain exactly token and envelope")
+        envelope = Envelope.loads(
+            json.dumps(data["envelope"], ensure_ascii=False, separators=(",", ":"))
+        )
+        return cls(token=data["token"], envelope=envelope)
+
 
 @dataclass(frozen=True)
 class HudEvent:
     type: str
-    content: Optional[str] = None
-    src: Optional[str] = None
-    alt: Optional[str] = None
-    state: Optional[str] = None
-    message: Optional[str] = None
-    ttl_ms: Optional[int] = None
+    content: str | None = None
+    src: str | None = None
+    alt: str | None = None
+    state: str | None = None
+    message: str | None = None
+    ttl_ms: int | None = None
+
 
 @dataclass(frozen=True)
 class MemoryRememberRequest:
@@ -37,8 +158,11 @@ class MemoryRememberRequest:
     kind: str
     sensitivity: str = "private"
     scope: str = "workspace"
+    importance: float = 0.8
+    confidence: float = 1.0
     pinned: bool = False
-    ttl_seconds: Optional[int] = None
+    ttl_seconds: int | None = None
+
 
 @dataclass(frozen=True)
 class MemoryRecallRequest:
@@ -48,3 +172,14 @@ class MemoryRecallRequest:
     limit: int = 6
     allow_private: bool = False
     allow_secret: bool = False
+
+
+@dataclass(frozen=True)
+class MemoryForgetRequest:
+    id: str
+
+
+@dataclass(frozen=True)
+class WorkerExecuteRequest:
+    capability: str
+    payload: dict[str, Any]

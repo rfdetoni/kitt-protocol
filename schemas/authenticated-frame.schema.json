@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/v1/authenticated-frame.schema.json",
+  "title": "KITT Authenticated Frame v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["token", "envelope"],
+  "properties": {
+    "token": { "type": "string", "minLength": 1 },
+    "envelope": { "$ref": "./envelope.schema.json" }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "token": "fixture-token",
+  "envelope": {
+    "version": 1,
+    "id": "req-ask-001",
+    "kind": "assistant.ask.request",
+    "payload": {
+      "text": "Olá",
+      "locale": "pt-BR",
+      "show_hud": true
+    }
+  }
+}

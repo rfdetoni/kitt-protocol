@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "id": "resp-ask-001",
+  "kind": "assistant.ask.response",
+  "correlation_id": "req-ask-001",
+  "payload": {
+    "text": "Olá!"
+  }
+}

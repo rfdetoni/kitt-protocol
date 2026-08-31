@@ -1,27 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://kitt.local/schemas/v1/envelope.schema.json",
-  "title": "KITT Envelope",
+  "title": "KITT Envelope v1",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "version",
-    "id",
-    "kind",
-    "payload"
-  ],
+  "required": ["version", "id", "kind", "payload"],
   "properties": {
-    "version": {
-      "const": 1
-    },
-    "id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "kind": {
-      "type": "string",
-      "minLength": 1
-    },
+    "version": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "minLength": 1 },
+    "correlation_id": { "type": ["string", "null"], "minLength": 1 },
     "payload": {}
   }
 }

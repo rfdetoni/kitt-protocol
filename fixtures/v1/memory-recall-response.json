@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "id": "resp-memory-001",
+  "kind": "memory.recall.response",
+  "correlation_id": "req-memory-001",
+  "payload": {
+    "records": [
+      {
+        "id": "mem_1",
+        "namespace": "agent-cli",
+        "workspace_id": "ws-1",
+        "kind": "architecture_decision",
+        "content": "Use protocol v1",
+        "sensitivity": "private",
+        "scope": "workspace",
+        "importance": 0.9,
+        "confidence": 1.0,
+        "pinned": true,
+        "created_at": 1,
+        "updated_at": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "id": "err-001",
+  "kind": "system.error",
+  "correlation_id": "req-ask-001",
+  "payload": {
+    "code": "invalid_request",
+    "message": "request rejected"
+  }
+}
