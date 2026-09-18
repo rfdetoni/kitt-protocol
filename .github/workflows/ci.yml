@@ -25,6 +25,8 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: { python-version: '3.13' }
+      - name: Verify cross-SDK contract parity
+        run: python scripts/check_contract_parity.py
       - run: PYTHONPATH=sdk/python python -m unittest discover sdk/python/tests
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with: { node-version: '22', cache: 'npm' }
