@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import ast
 import json
 import re
 from pathlib import Path
@@ -82,15 +83,26 @@ def required_memory_remember_fields() -> None:
     fields = ("sensitivity", "scope")
 
     python_source = read("sdk/python/kitt_protocol/models.py")
-    python_block = re.search(
-        r"class MemoryRememberRequest:\n(?P<body>(?:    .*\n)+?)(?=\n@dataclass|\Z)",
-        python_source,
+    module = ast.parse(python_source)
+    python_class = next(
+        (
+            node
+            for node in module.body
+            if isinstance(node, ast.ClassDef) and node.name == "MemoryRememberRequest"
+        ),
+        None,
     )
-    if not python_block:
+    if python_class is None:
         fail("Python MemoryRememberRequest not found")
+
+    python_fields = {
+        node.target.id: node
+        for node in python_class.body
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name)
+    }
     for field in fields:
-        line = re.search(rf"^    {field}:[^\n]+$", python_block.group("body"), re.M)
-        if not line or "=" in line.group(0):
+        node = python_fields.get(field)
+        if node is None or node.value is not None:
             fail(f"Python MemoryRememberRequest.{field} must be required")
 
     typescript_source = read("sdk/typescript/src/index.ts")
