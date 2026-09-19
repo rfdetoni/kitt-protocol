@@ -8,6 +8,7 @@ from kitt_protocol import (
     ASSISTANT_ASK_REQUEST,
     AuthenticatedFrame,
     Envelope,
+    MemoryRememberRequest,
     ProtocolError,
     SYSTEM_PING_REQUEST,
 )
@@ -47,6 +48,25 @@ class ProtocolModelsTest(unittest.TestCase):
         })
         with self.assertRaises(ProtocolError):
             Envelope.loads(raw)
+
+    def test_memory_remember_requires_security_scope(self):
+        with self.assertRaises(TypeError):
+            MemoryRememberRequest(
+                namespace="agent-cli",
+                workspace_id="workspace",
+                content="fact",
+                kind="technical_fact",
+            )
+        request = MemoryRememberRequest(
+            namespace="agent-cli",
+            workspace_id="workspace",
+            content="fact",
+            kind="technical_fact",
+            sensitivity="private",
+            scope="workspace",
+        )
+        self.assertEqual("private", request.sensitivity)
+        self.assertEqual("workspace", request.scope)
 
     def test_authenticated_frame_hides_token_in_repr(self):
         frame = AuthenticatedFrame(

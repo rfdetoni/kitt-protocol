@@ -78,7 +78,48 @@ def compare(label: str, *values: tuple[str, set[str] | dict[str, str]]) -> None:
             fail(f"{label} drift: {baseline_name}={baseline!r}; {name}={value!r}")
 
 
+def required_memory_remember_fields() -> None:
+    fields = ("sensitivity", "scope")
+
+    python_source = read("sdk/python/kitt_protocol/models.py")
+    python_block = re.search(
+        r"class MemoryRememberRequest:\n(?P<body>(?:    .*\n)+?)(?=\n@dataclass|\Z)",
+        python_source,
+    )
+    if not python_block:
+        fail("Python MemoryRememberRequest not found")
+    for field in fields:
+        line = re.search(rf"^    {field}:[^\n]+$", python_block.group("body"), re.M)
+        if not line or "=" in line.group(0):
+            fail(f"Python MemoryRememberRequest.{field} must be required")
+
+    typescript_source = read("sdk/typescript/src/index.ts")
+    ts_block = re.search(
+        r"export interface MemoryRememberRequest \{(?P<body>.*?)\n\}",
+        typescript_source,
+        re.S,
+    )
+    if not ts_block:
+        fail("TypeScript MemoryRememberRequest not found")
+    for field in fields:
+        if not re.search(rf"\b{field}\s*:", ts_block.group("body")):
+            fail(f"TypeScript MemoryRememberRequest.{field} must be required")
+
+    rust_source = read("src/lib.rs")
+    rust_block = re.search(
+        r"pub struct MemoryRememberRequest \{(?P<body>.*?)\n\}",
+        rust_source,
+        re.S,
+    )
+    if not rust_block:
+        fail("Rust MemoryRememberRequest not found")
+    for field in fields:
+        if not re.search(rf"pub {field}:\s*[^,]+,", rust_block.group("body")):
+            fail(f"Rust MemoryRememberRequest.{field} must be required")
+
+
 def main() -> int:
+    required_memory_remember_fields()
     compare(
         "message kinds",
         ("rust", rust_kinds()),

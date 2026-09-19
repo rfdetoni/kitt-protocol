@@ -170,8 +170,8 @@ class MemoryRememberRequest:
     workspace_id: str
     content: str
     kind: str
-    sensitivity: str = "private"
-    scope: str = "workspace"
+    sensitivity: str
+    scope: str
     importance: float = 0.8
     confidence: float = 1.0
     pinned: bool = False
