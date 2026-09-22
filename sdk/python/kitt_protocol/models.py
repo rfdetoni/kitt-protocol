@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from typing import Any
 import json
 import uuid
@@ -76,21 +76,20 @@ class Envelope:
         ):
             raise ProtocolError("correlation_id cannot be empty")
 
-    def dumps(self) -> str:
-        data = asdict(self)
-        if self.correlation_id is None:
-            data.pop("correlation_id")
-        return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    def to_mapping(self) -> dict[str, Any]:
+        data = {
+            "version": self.version,
+            "id": self.id,
+            "kind": self.kind,
+            "payload": self.payload,
+        }
+        if self.correlation_id is not None:
+            data["correlation_id"] = self.correlation_id
+        return data
 
     @classmethod
-    def loads(cls, raw: str | bytes) -> "Envelope":
-        encoded = raw.encode("utf-8") if isinstance(raw, str) else raw
-        if len(encoded) > MAX_FRAME_BYTES:
-            raise ProtocolError("frame_too_large")
-        try:
-            data = _ensure_object(json.loads(encoded), "envelope")
-        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            raise ProtocolError(f"invalid_json: {exc}") from exc
+    def from_mapping(cls, value: Any) -> "Envelope":
+        data = _ensure_object(value, "envelope")
         allowed = {"version", "id", "kind", "correlation_id", "payload"}
         required = {"version", "id", "kind", "payload"}
         unknown = set(data) - allowed
@@ -106,6 +105,24 @@ class Envelope:
             correlation_id=data.get("correlation_id"),
             payload=data["payload"],
         )
+
+    def dumps(self) -> str:
+        return json.dumps(
+            self.to_mapping(),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
+
+    @classmethod
+    def loads(cls, raw: str | bytes) -> "Envelope":
+        encoded = raw.encode("utf-8") if isinstance(raw, str) else raw
+        if len(encoded) > MAX_FRAME_BYTES:
+            raise ProtocolError("frame_too_large")
+        try:
+            data = json.loads(encoded)
+        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+            raise ProtocolError(f"invalid_json: {exc}") from exc
+        return cls.from_mapping(data)
 
     @classmethod
     def response(cls, kind: str, request_id: str, payload: Any) -> "Envelope":
@@ -131,7 +148,7 @@ class AuthenticatedFrame:
 
     def dumps(self) -> str:
         return json.dumps(
-            {"token": self.token, "envelope": json.loads(self.envelope.dumps())},
+            {"token": self.token, "envelope": self.envelope.to_mapping()},
             ensure_ascii=False,
             separators=(",", ":"),
         )
@@ -147,10 +164,10 @@ class AuthenticatedFrame:
             raise ProtocolError(f"invalid_json: {exc}") from exc
         if set(data) != {"token", "envelope"}:
             raise ProtocolError("authenticated frame must contain exactly token and envelope")
-        envelope = Envelope.loads(
-            json.dumps(data["envelope"], ensure_ascii=False, separators=(",", ":"))
+        return cls(
+            token=data["token"],
+            envelope=Envelope.from_mapping(data["envelope"]),
         )
-        return cls(token=data["token"], envelope=envelope)
 
 
 @dataclass(frozen=True)
