@@ -14,10 +14,11 @@
         "sensitivity": "private",
         "scope": "workspace",
         "importance": 0.9,
-        "confidence": 1.0,
+        "confidence": 1,
         "pinned": true,
         "created_at": 1,
-        "updated_at": 2
+        "updated_at": 2,
+        "scope_key": null
       }
     ]
   }

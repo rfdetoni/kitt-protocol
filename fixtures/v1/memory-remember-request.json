@@ -1,0 +1,21 @@
+{
+  "token": "fixture-token",
+  "envelope": {
+    "version": 1,
+    "id": "req-memory-remember-001",
+    "kind": "memory.remember.request",
+    "payload": {
+      "namespace": "agent-cli",
+      "workspace_id": "ws-1",
+      "content": "Conversation rule",
+      "kind": "project_rule",
+      "sensitivity": "private",
+      "scope": "conversation",
+      "scope_key": "conversation-42",
+      "importance": 0.8,
+      "confidence": 1,
+      "pinned": true,
+      "ttl_seconds": null
+    }
+  }
+}

@@ -80,6 +80,7 @@ export interface MemoryRememberRequest {
   kind: MemoryKind;
   sensitivity: Sensitivity;
   scope: MemoryScope;
+  scope_key?: string | null;
   importance?: number;
   confidence?: number;
   pinned?: boolean;
@@ -89,8 +90,10 @@ export interface MemoryRememberRequest {
 export interface MemoryRecallRequest {
   namespace: string;
   workspace_id: string;
+  scope_key?: string | null;
   query?: string;
   limit?: number;
+  as_of?: number | null;
   allow_private?: boolean;
   allow_secret?: boolean;
 }
@@ -103,6 +106,7 @@ export interface MemoryDto {
   content: string;
   sensitivity: Sensitivity;
   scope: MemoryScope;
+  scope_key?: string | null;
   importance: number;
   confidence: number;
   pinned: boolean;

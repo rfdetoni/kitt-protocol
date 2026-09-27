@@ -10,7 +10,9 @@
       "query": "architecture",
       "limit": 8,
       "allow_private": true,
-      "allow_secret": false
+      "allow_secret": false,
+      "scope_key": "conversation-42",
+      "as_of": 1700000000
     }
   }
 }

@@ -189,6 +189,7 @@ class MemoryRememberRequest:
     kind: str
     sensitivity: str
     scope: str
+    scope_key: str | None = None
     importance: float = 0.8
     confidence: float = 1.0
     pinned: bool = False
@@ -201,6 +202,8 @@ class MemoryRecallRequest:
     workspace_id: str
     query: str = ""
     limit: int = 6
+    scope_key: str | None = None
+    as_of: int | None = None
     allow_private: bool = False
     allow_secret: bool = False
 

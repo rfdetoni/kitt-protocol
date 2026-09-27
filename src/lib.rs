@@ -273,6 +273,8 @@ pub struct MemoryRememberRequest {
     pub kind: MemoryKind,
     pub sensitivity: Sensitivity,
     pub scope: MemoryScope,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
     #[serde(default = "default_importance")]
     pub importance: f32,
     #[serde(default = "default_confidence")]
@@ -294,10 +296,14 @@ fn default_confidence() -> f32 {
 pub struct MemoryRecallRequest {
     pub namespace: String,
     pub workspace_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
     #[serde(default)]
     pub query: String,
     #[serde(default = "default_memory_limit")]
     pub limit: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub as_of: Option<i64>,
     #[serde(default)]
     pub allow_private: bool,
     #[serde(default)]
@@ -335,6 +341,8 @@ pub struct MemoryDto {
     pub content: String,
     pub sensitivity: Sensitivity,
     pub scope: MemoryScope,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
     pub importance: f32,
     pub confidence: f32,
     pub pinned: bool,

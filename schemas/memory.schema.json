@@ -80,6 +80,13 @@
     },
     "updated_at": {
       "type": "integer"
+    },
+    "scope_key": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1
     }
   }
 }

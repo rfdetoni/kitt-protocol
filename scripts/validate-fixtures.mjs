@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 const fixtures = [
   "fixtures/v1/assistant-ask-request.json",
   "fixtures/v1/assistant-ask-response.json",
+  "fixtures/v1/memory-remember-request.json",
   "fixtures/v1/memory-recall-request.json",
   "fixtures/v1/memory-recall-response.json",
   "fixtures/v1/hud-event.json",
