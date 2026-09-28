@@ -189,6 +189,11 @@ MIT. See [LICENSE](LICENSE).
 
 ## Memory contract 0.2
 
-Package version 0.2.0 keeps envelope protocol **v1** and extends memory payloads additively. `scope_key` identifies a conversation when `scope = "conversation"`; `as_of` enables point-in-time recall; recalled DTOs may include `scope_key`. Workspace/global callers may omit both fields.
+Package version 0.2.1 keeps envelope protocol **v1** and extends memory payloads additively. `scope_key` identifies a conversation when `scope = "conversation"`; `as_of` enables point-in-time recall; recalled DTOs may include `scope_key`. Workspace/global callers may omit both fields.
 
 Rust consumers must update struct literals because these additional fields are a source-level API change. The package therefore advances to 0.2.0 while the wire envelope remains protocol v1.
+
+
+### Python support policy
+
+KITT Protocol 0.2.1 declares Python **3.14+** for its Python SDK. This matches the ecosystem policy of supporting and continuously validating only the current Python interpreter rather than advertising older minors that are no longer exercised by CI. Rust/TypeScript wire semantics are unchanged.
