@@ -32,6 +32,8 @@ pub mod kinds {
     pub const MEMORY_RECALL_RESPONSE: &str = "memory.recall.response";
     pub const MEMORY_FORGET_REQUEST: &str = "memory.forget.request";
     pub const MEMORY_FORGET_RESPONSE: &str = "memory.forget.response";
+    pub const MEMORY_MANAGE_REQUEST: &str = "memory.manage.request";
+    pub const MEMORY_MANAGE_RESPONSE: &str = "memory.manage.response";
     pub const HUD_SUBSCRIBE_REQUEST: &str = "hud.subscribe.request";
     pub const HUD_SUBSCRIBE_RESPONSE: &str = "hud.subscribe.response";
     pub const HUD_IMAGE_REQUEST: &str = "hud.image.request";
@@ -450,4 +452,13 @@ mod tests {
             Envelope::decode(include_bytes!("../fixtures/v1/assistant-ask-response.json")).unwrap();
         assert_eq!(response.correlation_id.as_deref(), Some("req-ask-001"));
     }
+}
+
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryManageRequest {
+    pub operation: String,
+    #[serde(default)]
+    pub arguments: Value,
 }

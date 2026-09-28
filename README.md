@@ -222,3 +222,8 @@ Surface contracts describe declarative components, bounded state, revisioned pat
 
 Backend IR represents schemas, entities, queries, commands, endpoints, events, workflows, policies, jobs and observability resources. It is an intent/plan representation, not executable code. Validation, impact analysis, approvals and compilation remain host responsibilities.
 
+
+
+## Memory service control plane (0.4)
+
+The memory hot path remains `memory.remember`, `memory.recall` and `memory.forget`. Package 0.4 adds `memory.manage.request/response` for operations owned by the dedicated memory service, such as status changes, evidence/provenance, dream commits, maintenance and bounded administrative reads. The operation name is interpreted only by a trusted kitt-memory service; callers cannot use it as an arbitrary command execution channel.

@@ -25,6 +25,8 @@ MEMORY_RECALL_REQUEST = "memory.recall.request"
 MEMORY_RECALL_RESPONSE = "memory.recall.response"
 MEMORY_FORGET_REQUEST = "memory.forget.request"
 MEMORY_FORGET_RESPONSE = "memory.forget.response"
+MEMORY_MANAGE_REQUEST = "memory.manage.request"
+MEMORY_MANAGE_RESPONSE = "memory.manage.response"
 HUD_SUBSCRIBE_REQUEST = "hud.subscribe.request"
 HUD_SUBSCRIBE_RESPONSE = "hud.subscribe.response"
 HUD_IMAGE_REQUEST = "hud.image.request"
@@ -374,3 +376,9 @@ class BackendPlan:
     changeset: ChangeSet
     affected_resources: tuple[ResourceRef, ...] = ()
     issues: tuple[ValidationIssue, ...] = ()
+
+
+@dataclass(frozen=True)
+class MemoryManageRequest:
+    operation: str
+    arguments: dict[str, Any] = field(default_factory=dict)

@@ -19,6 +19,8 @@ export const KINDS = {
   MEMORY_RECALL_RESPONSE: "memory.recall.response",
   MEMORY_FORGET_REQUEST: "memory.forget.request",
   MEMORY_FORGET_RESPONSE: "memory.forget.response",
+  MEMORY_MANAGE_REQUEST: "memory.manage.request",
+  MEMORY_MANAGE_RESPONSE: "memory.manage.response",
   HUD_SUBSCRIBE_REQUEST: "hud.subscribe.request",
   HUD_SUBSCRIBE_RESPONSE: "hud.subscribe.response",
   HUD_IMAGE_REQUEST: "hud.image.request",
@@ -270,4 +272,10 @@ export interface BackendPlan {
   changeset: ChangeSet;
   affected_resources?: ResourceRef[];
   issues?: ValidationIssue[];
+}
+
+
+export interface MemoryManageRequest {
+  operation: string;
+  arguments?: Record<string, unknown>;
 }

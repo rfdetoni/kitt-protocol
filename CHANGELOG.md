@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 - 2026-09-28
+
+- Add `memory.manage.request/response` for the dedicated kitt-memory service control plane.
+- Keep protocol Envelope v1 unchanged.
+- Define a bounded generic management payload used for memory status, evidence, dream-run, maintenance and administrative operations.
+- Preserve normal remember/recall/forget messages for the hot path.
+
+
 ## 0.3.0 - 2026-09-28
 
 - Add semantic cross-component contracts for resource references, evidence, capability negotiation and typed effect classes.
