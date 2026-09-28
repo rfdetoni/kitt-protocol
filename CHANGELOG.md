@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 - 2026-09-27
+
+- Align the Python SDK support floor with the ecosystem's single supported/validated interpreter, Python 3.14.
+- Keep envelope protocol v1 and all 0.2.0 memory payload semantics unchanged.
+- Bump Rust, Python and TypeScript package versions together so cross-language package metadata remains coherent.
+
+
 ## 0.2.0 - 2026-09-27
 
 - Extend protocol-v1 memory requests with optional conversation `scope_key`.
