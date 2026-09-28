@@ -36,6 +36,19 @@ export const KINDS = {
   SETTINGS_APPLY_RESPONSE: "settings.apply.response",
   SETTINGS_HEALTH_REQUEST: "settings.health.request",
   SETTINGS_HEALTH_RESPONSE: "settings.health.response",
+  CAPABILITIES_REQUEST: "capabilities.request",
+  CAPABILITIES_RESPONSE: "capabilities.response",
+  SURFACE_CREATE: "surface.create",
+  SURFACE_PATCH: "surface.patch",
+  SURFACE_DELETE: "surface.delete",
+  SURFACE_ACTION: "surface.action",
+  SURFACE_VALIDATION_FAILED: "surface.validation_failed",
+  BACKEND_VALIDATE_REQUEST: "backend.validate.request",
+  BACKEND_VALIDATE_RESPONSE: "backend.validate.response",
+  BACKEND_PLAN_REQUEST: "backend.plan.request",
+  BACKEND_PLAN_RESPONSE: "backend.plan.response",
+  BACKEND_APPLY_REQUEST: "backend.apply.request",
+  BACKEND_APPLY_RESPONSE: "backend.apply.response",
 } as const;
 
 export type ModelRoute = "auto" | "fast" | "heavy";
@@ -151,4 +164,110 @@ export function parseAuthenticatedFrame(value: unknown): AuthenticatedFrame {
     throw new Error("invalid authentication token");
   }
   return { token: value.token, envelope: parseEnvelope(value.envelope) };
+}
+
+
+export type EffectClass =
+  | "pure" | "read" | "write" | "destructive" | "external_side_effect" | "privileged";
+
+export interface ResourceRef {
+  uri: string;
+  revision?: string | null;
+  digest?: string | null;
+}
+
+export interface EvidenceRef {
+  source: ResourceRef;
+  observed_at: number;
+  confidence?: number;
+  note?: string | null;
+}
+
+export interface CapabilitySet {
+  protocol: string;
+  capabilities: string[];
+}
+
+export interface ChangeOperation {
+  op: string;
+  target: string;
+  value?: unknown;
+  effect: EffectClass;
+  evidence?: EvidenceRef[];
+}
+
+export interface ChangeSet {
+  id: string;
+  domain: string;
+  base_revision?: string | null;
+  operations: ChangeOperation[];
+  metadata?: Record<string, unknown>;
+}
+
+export type ValidationSeverity = "info" | "warning" | "error";
+export interface ValidationIssue {
+  code: string;
+  message: string;
+  severity: ValidationSeverity;
+  path?: string | null;
+}
+
+export interface SurfaceComponent {
+  id: string;
+  component: string;
+  props?: Record<string, unknown>;
+  children?: string[];
+}
+
+export interface Surface {
+  id: string;
+  revision: number;
+  catalog_id: string;
+  root: string;
+  components?: SurfaceComponent[];
+  state?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+}
+
+export interface SurfacePatch {
+  surface_id: string;
+  base_revision: number;
+  operations: ChangeOperation[];
+}
+
+export interface SurfaceAction {
+  surface_id: string;
+  component_id: string;
+  action: string;
+  context?: Record<string, unknown>;
+}
+
+export interface RendererCapabilities {
+  surface_protocol: string;
+  catalogs: string[];
+  components: string[];
+  features?: string[];
+  max_depth?: number;
+  max_nodes?: number;
+}
+
+export interface BackendResource {
+  id: string;
+  kind: string;
+  spec?: Record<string, unknown>;
+}
+
+export interface BackendModule {
+  id: string;
+  revision: number;
+  metadata?: Record<string, unknown>;
+  resources: BackendResource[];
+}
+
+export interface BackendPlan {
+  backend_id: string;
+  base_revision: number;
+  changeset: ChangeSet;
+  affected_resources?: ResourceRef[];
+  issues?: ValidationIssue[];
 }

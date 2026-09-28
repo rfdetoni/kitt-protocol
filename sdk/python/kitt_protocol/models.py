@@ -42,6 +42,19 @@ SETTINGS_APPLY_REQUEST = "settings.apply.request"
 SETTINGS_APPLY_RESPONSE = "settings.apply.response"
 SETTINGS_HEALTH_REQUEST = "settings.health.request"
 SETTINGS_HEALTH_RESPONSE = "settings.health.response"
+CAPABILITIES_REQUEST = "capabilities.request"
+CAPABILITIES_RESPONSE = "capabilities.response"
+SURFACE_CREATE = "surface.create"
+SURFACE_PATCH = "surface.patch"
+SURFACE_DELETE = "surface.delete"
+SURFACE_ACTION = "surface.action"
+SURFACE_VALIDATION_FAILED = "surface.validation_failed"
+BACKEND_VALIDATE_REQUEST = "backend.validate.request"
+BACKEND_VALIDATE_RESPONSE = "backend.validate.response"
+BACKEND_PLAN_REQUEST = "backend.plan.request"
+BACKEND_PLAN_RESPONSE = "backend.plan.response"
+BACKEND_APPLY_REQUEST = "backend.apply.request"
+BACKEND_APPLY_RESPONSE = "backend.apply.response"
 
 
 class ProtocolError(ValueError):
@@ -244,3 +257,120 @@ class TranscribeRequest:
 @dataclass(frozen=True)
 class TranscribeResponse:
     text: str
+
+
+# Semantic protocol contracts -------------------------------------------------
+
+@dataclass(frozen=True)
+class ResourceRef:
+    uri: str
+    revision: str | None = None
+    digest: str | None = None
+
+
+@dataclass(frozen=True)
+class EvidenceRef:
+    source: ResourceRef
+    observed_at: int
+    confidence: float = 1.0
+    note: str | None = None
+
+
+@dataclass(frozen=True)
+class CapabilitySet:
+    protocol: str
+    capabilities: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class ChangeOperation:
+    op: str
+    target: str
+    effect: str
+    value: Any = None
+    evidence: tuple[EvidenceRef, ...] = ()
+
+
+@dataclass(frozen=True)
+class ChangeSet:
+    id: str
+    domain: str
+    base_revision: str | None = None
+    operations: tuple[ChangeOperation, ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class ValidationIssue:
+    code: str
+    message: str
+    severity: str = "error"
+    path: str | None = None
+
+
+@dataclass(frozen=True)
+class SurfaceComponent:
+    id: str
+    component: str
+    props: dict[str, Any] = field(default_factory=dict)
+    children: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class Surface:
+    id: str
+    revision: int
+    catalog_id: str
+    root: str
+    components: tuple[SurfaceComponent, ...] = ()
+    state: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class SurfacePatch:
+    surface_id: str
+    base_revision: int
+    operations: tuple[ChangeOperation, ...] = ()
+
+
+@dataclass(frozen=True)
+class SurfaceAction:
+    surface_id: str
+    component_id: str
+    action: str
+    context: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class RendererCapabilities:
+    surface_protocol: str = "surface.v1"
+    catalogs: tuple[str, ...] = ()
+    components: tuple[str, ...] = ()
+    features: tuple[str, ...] = ()
+    max_depth: int = 16
+    max_nodes: int = 256
+
+
+@dataclass(frozen=True)
+class BackendResource:
+    id: str
+    kind: str
+    spec: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class BackendModule:
+    id: str
+    revision: int
+    metadata: dict[str, Any] = field(default_factory=dict)
+    resources: tuple[BackendResource, ...] = ()
+
+
+@dataclass(frozen=True)
+class BackendPlan:
+    backend_id: str
+    base_revision: int
+    changeset: ChangeSet
+    affected_resources: tuple[ResourceRef, ...] = ()
+    issues: tuple[ValidationIssue, ...] = ()

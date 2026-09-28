@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/v1/backend.schema.json",
+  "title": "KITT Backend IR v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "revision", "resources"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "revision": {"type": "integer", "minimum": 0},
+    "metadata": {"type": "object"},
+    "resources": {
+      "type": "array",
+      "maxItems": 512,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "spec"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "maxLength": 256},
+          "kind": {
+            "enum": ["schema", "entity", "query", "command", "endpoint", "event", "workflow", "policy", "job", "observability"]
+          },
+          "spec": {"type": "object"}
+        }
+      }
+    }
+  }
+}

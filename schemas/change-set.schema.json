@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/v1/change-set.schema.json",
+  "title": "KITT ChangeSet",
+  "$defs": {
+    "effect": {
+      "enum": ["pure", "read", "write", "destructive", "external_side_effect", "privileged"]
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "target", "effect"],
+      "properties": {
+        "op": {"type": "string", "minLength": 1, "maxLength": 64},
+        "target": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "value": {},
+        "effect": {"$ref": "#/$defs/effect"},
+        "evidence": {"type": "array", "maxItems": 64}
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "domain", "operations"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "domain": {"type": "string", "minLength": 1, "maxLength": 64},
+    "base_revision": {"type": ["string", "null"], "maxLength": 256},
+    "operations": {"type": "array", "maxItems": 256, "items": {"$ref": "#/$defs/operation"}},
+    "metadata": {"type": "object"}
+  }
+}

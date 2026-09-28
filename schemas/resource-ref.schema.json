@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/v1/resource-ref.schema.json",
+  "title": "KITT Resource Reference",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["uri"],
+  "properties": {
+    "uri": {"type": "string", "pattern": "^kitt://", "maxLength": 2048},
+    "revision": {"type": ["string", "null"], "maxLength": 256},
+    "digest": {"type": ["string", "null"], "maxLength": 256}
+  }
+}

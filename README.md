@@ -24,6 +24,9 @@ K.I.T.T. Protocol defines the external contracts used between independently pack
 - Transport-neutral messages usable over loopback TCP, NDJSON, Unix sockets or named pipes.
 - Authentication metadata without putting plain-text credentials into event payloads.
 - Contracts for system health, assistant routing, transcription, memory, HUD, workers and Control Center settings.
+- Semantic resource references, evidence and capability negotiation.
+- Generic auditable ChangeSets with host-owned side-effect classification.
+- KITT Surface v1 and Backend IR v1 cross-component contracts.
 
 ---
 
@@ -197,3 +200,25 @@ Rust consumers must update struct literals because these additional fields are a
 ### Python support policy
 
 KITT Protocol 0.2.1 declares Python **3.14+** for its Python SDK. This matches the ecosystem policy of supporting and continuously validating only the current Python interpreter rather than advertising older minors that are no longer exercised by CI. Rust/TypeScript wire semantics are unchanged.
+
+
+## Semantic contracts 0.3
+
+Package 0.3.0 introduces a semantic layer while retaining Envelope protocol v1.
+
+### Resource namespace
+
+Cross-component references use logical `kitt://` URIs. The URI identifies an owner and resource, but does not transfer authority between modules. Repository files remain repository-owned, shared semantic memory remains memory-owned, transient surfaces remain renderer/runtime-owned, and generated backend source remains repository-owned after application.
+
+### Effects and ChangeSets
+
+Every mutation-capable domain can represent proposed work as a `ChangeSet`. Effects are classified as `pure`, `read`, `write`, `destructive`, `external_side_effect` or `privileged`. Consumers MUST reclassify model-provided effects against host policy before execution.
+
+### Surface v1
+
+Surface contracts describe declarative components, bounded state, revisioned patches, semantic actions and renderer capabilities. A Surface is data, never executable UI code. Renderers expose allowlisted catalogs and user actions are returned to the host policy/runtime layer rather than invoking arbitrary tools.
+
+### Backend IR v1
+
+Backend IR represents schemas, entities, queries, commands, endpoints, events, workflows, policies, jobs and observability resources. It is an intent/plan representation, not executable code. Validation, impact analysis, approvals and compilation remain host responsibilities.
+

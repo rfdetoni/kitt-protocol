@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/v1/surface.schema.json",
+  "title": "KITT Surface v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "revision", "catalog_id", "root", "components"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "revision": {"type": "integer", "minimum": 0},
+    "catalog_id": {"type": "string", "minLength": 1, "maxLength": 128},
+    "root": {"type": "string", "minLength": 1, "maxLength": 128},
+    "components": {
+      "type": "array",
+      "maxItems": 256,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "component"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1, "maxLength": 128},
+          "component": {"type": "string", "minLength": 1, "maxLength": 128},
+          "props": {"type": "object"},
+          "children": {"type": "array", "maxItems": 128, "items": {"type": "string"}}
+        }
+      }
+    },
+    "state": {"type": "object"},
+    "metadata": {"type": "object"}
+  }
+}

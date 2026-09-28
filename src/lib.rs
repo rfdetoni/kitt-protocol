@@ -8,6 +8,9 @@ pub use multillm::{
     TranscribeResponse,
 };
 
+mod semantic;
+pub use semantic::*;
+
 pub const PROTOCOL_VERSION: u16 = 1;
 pub const MAX_FRAME_BYTES: usize = 1024 * 1024;
 
@@ -46,6 +49,19 @@ pub mod kinds {
     pub const SETTINGS_APPLY_RESPONSE: &str = "settings.apply.response";
     pub const SETTINGS_HEALTH_REQUEST: &str = "settings.health.request";
     pub const SETTINGS_HEALTH_RESPONSE: &str = "settings.health.response";
+    pub const CAPABILITIES_REQUEST: &str = "capabilities.request";
+    pub const CAPABILITIES_RESPONSE: &str = "capabilities.response";
+    pub const SURFACE_CREATE: &str = "surface.create";
+    pub const SURFACE_PATCH: &str = "surface.patch";
+    pub const SURFACE_DELETE: &str = "surface.delete";
+    pub const SURFACE_ACTION: &str = "surface.action";
+    pub const SURFACE_VALIDATION_FAILED: &str = "surface.validation_failed";
+    pub const BACKEND_VALIDATE_REQUEST: &str = "backend.validate.request";
+    pub const BACKEND_VALIDATE_RESPONSE: &str = "backend.validate.response";
+    pub const BACKEND_PLAN_REQUEST: &str = "backend.plan.request";
+    pub const BACKEND_PLAN_RESPONSE: &str = "backend.plan.response";
+    pub const BACKEND_APPLY_REQUEST: &str = "backend.apply.request";
+    pub const BACKEND_APPLY_RESPONSE: &str = "backend.apply.response";
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
