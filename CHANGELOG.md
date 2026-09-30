@@ -1,6 +1,12 @@
 # Changelog
 
-## 0.5.1 - 2026-09-30
+## 0.5.2 - 2026-09-30
+
+- Add shared `KittRequestMetadata` across Rust, Python and TypeScript SDKs.
+- Make conversation/turn/request/route correlation an explicit cross-component value contract instead of an ad-hoc Agent/Proxy payload.
+- Keep Envelope protocol v1 and ContextEnvelope schema v1 unchanged.
+
+## 0.5.2 - 2026-09-30
 
 - Add shared `AgentRole` and `MemoryLifecycleEvent` contracts across Rust, Python and TypeScript SDKs.
 - Restore TypeScript parity for saved granular permissions and plugin capability declarations.
