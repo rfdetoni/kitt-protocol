@@ -469,6 +469,27 @@ mod tests {
     }
 
     #[test]
+    fn request_metadata_round_trip_and_validation() {
+        let metadata = KittRequestMetadata {
+            conversation_id: "conversation-1".into(),
+            turn_id: "turn-1".into(),
+            request_id: "request-1".into(),
+            route: "agent-loop".into(),
+            session_id: Some("session-1".into()),
+        };
+        metadata.validate().unwrap();
+        let wire = serde_json::to_vec(&metadata).unwrap();
+        let decoded: KittRequestMetadata = serde_json::from_slice(&wire).unwrap();
+        assert_eq!(decoded, metadata);
+
+        let invalid = KittRequestMetadata {
+            conversation_id: String::new(),
+            ..metadata
+        };
+        assert!(invalid.validate().is_err());
+    }
+
+    #[test]
     fn duplicate_segment_ids_are_rejected() {
         let segment = ContextSegment {
             id: "dup".into(),
