@@ -139,6 +139,40 @@ pub enum EventDurability {
     Error,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct KittRequestMetadata {
+    pub conversation_id: String,
+    pub turn_id: String,
+    pub request_id: String,
+    pub route: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub session_id: Option<String>,
+}
+
+impl KittRequestMetadata {
+    pub fn validate(&self) -> Result<(), String> {
+        for (name, value) in [
+            ("conversation_id", self.conversation_id.as_str()),
+            ("turn_id", self.turn_id.as_str()),
+            ("request_id", self.request_id.as_str()),
+            ("route", self.route.as_str()),
+        ] {
+            if value.trim().is_empty() {
+                return Err(format!("{name} is required"));
+            }
+        }
+        if self
+            .session_id
+            .as_deref()
+            .is_some_and(|value| value.trim().is_empty())
+        {
+            return Err("session_id must be non-empty when present".into());
+        }
+        Ok(())
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct AgentEvent {
