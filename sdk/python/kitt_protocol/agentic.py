@@ -112,6 +112,25 @@ class ContextEnvelope:
         return _wire(self)
 
 @dataclass(frozen=True)
+class KittRequestMetadata:
+    conversation_id: str
+    turn_id: str
+    request_id: str
+    route: str
+    session_id: str | None = None
+
+    def __post_init__(self) -> None:
+        for name in ("conversation_id", "turn_id", "request_id", "route"):
+            if not str(getattr(self, name) or "").strip():
+                raise ValueError(f"{name} is required")
+        if self.session_id is not None and not str(self.session_id).strip():
+            raise ValueError("session_id must be non-empty when present")
+
+    def to_mapping(self) -> dict[str, Any]:
+        return _wire(self)
+
+
+@dataclass(frozen=True)
 class AgentEvent:
     event_id: str
     conversation_id: str
