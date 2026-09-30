@@ -13,6 +13,8 @@
 
 K.I.T.T. Protocol defines the external contracts used between independently packaged K.I.T.T. components. Canonical JSON Schemas are paired with small SDKs so the Agent, Assistant, Memory, workers and native services can evolve without duplicating transport logic or coupling their implementations.
 
+Protocol **0.5.1** keeps Envelope protocol v1 and aligns the agentic SDKs around structural agent roles, saved permissions, plugin capabilities, execution authority and the public Memory lifecycle evidence contract. `MemoryLifecycleEvent` carries only source identity/revision/digest metadata; durable semantic memory remains owned by `kitt-memoryd`.
+
 ---
 
 ## What’s included
