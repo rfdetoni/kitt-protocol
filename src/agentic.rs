@@ -314,6 +314,19 @@ pub enum AgentRole {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
+pub struct MemoryLifecycleEvent {
+    pub event: String,
+    pub namespace: String,
+    pub workspace_id: String,
+    pub source_id: String,
+    pub source_revision: String,
+    pub input_digest: String,
+    pub source_kind: String,
+    pub source_watermark: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct SavedPermission {
     pub workspace_id: String,
     pub action: String,
