@@ -68,6 +68,65 @@ class ProtocolModelsTest(unittest.TestCase):
         self.assertEqual("private", request.sensitivity)
         self.assertEqual("workspace", request.scope)
 
+    def test_context_envelope_round_trip(self):
+        from kitt_protocol import (
+            CacheRegion,
+            ContextEnvelope,
+            ContextKind,
+            ContextSegment,
+            ContextStability,
+            ContextTrust,
+            RecoveryMode,
+        )
+        segment = ContextSegment(
+            id="intent",
+            kind=ContextKind.USER_INTENT,
+            source="user",
+            trust=ContextTrust.TRUSTED,
+            stability=ContextStability.TURN,
+            priority=100,
+            sensitivity="private",
+            recovery=RecoveryMode.NONE,
+            cache_region=CacheRegion.LIVE_ZONE,
+            lifecycle="turn",
+            provenance_digest="abc",
+            token_cost=3,
+            body_ref={"text": "implement"},
+            ttl_turns=1,
+        )
+        envelope = ContextEnvelope(epoch="epoch-1", segments=(segment,))
+        mapping = envelope.to_mapping()
+        self.assertEqual(1, mapping["schema_version"])
+        self.assertEqual("USER_INTENT", mapping["segments"][0]["kind"])
+
+    def test_context_envelope_rejects_duplicate_ids(self):
+        from kitt_protocol import (
+            CacheRegion,
+            ContextEnvelope,
+            ContextKind,
+            ContextSegment,
+            ContextStability,
+            ContextTrust,
+            RecoveryMode,
+        )
+        segment = ContextSegment(
+            id="dup",
+            kind=ContextKind.TOOL_SCHEMA,
+            source="host",
+            trust=ContextTrust.TRUSTED,
+            stability=ContextStability.BUILD,
+            priority=90,
+            sensitivity="normal",
+            recovery=RecoveryMode.RECOMPUTE,
+            cache_region=CacheRegion.FROZEN_PREFIX,
+            lifecycle="build",
+            provenance_digest="x",
+            token_cost=1,
+            body_ref={},
+        )
+        with self.assertRaises(ValueError):
+            ContextEnvelope(epoch="epoch-1", segments=(segment, segment))
+
     def test_authenticated_frame_hides_token_in_repr(self):
         frame = AuthenticatedFrame(
             token="super-secret",

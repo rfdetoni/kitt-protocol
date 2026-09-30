@@ -279,3 +279,164 @@ export interface MemoryManageRequest {
   operation: string;
   arguments?: Record<string, unknown>;
 }
+
+
+// Agentic protocol contracts ---------------------------------------------------
+export type ContextKind =
+  | "SYSTEM_INSTRUCTION" | "USER_INTENT" | "MEMORY_RECALL" | "MEMORY_CORRECTION"
+  | "SKILL" | "PROJECT_GUIDELINE" | "HARNESS_KNOWLEDGE" | "REPOSITORY_MAP"
+  | "FILE_EVIDENCE" | "SEARCH_EVIDENCE" | "TOOL_SCHEMA" | "TOOL_RESULT"
+  | "TOOL_RECEIPT" | "SUBAGENT_RESULT" | "VALIDATION_EVIDENCE" | "ERROR_EVIDENCE"
+  | "COMPACTION_CHECKPOINT" | "OUTPUT_CONTRACT";
+export type ContextStability = "BUILD" | "SESSION" | "TURN";
+export type RecoveryMode = "NONE" | "EXACT" | "SOURCE_REF" | "RECOMPUTE";
+export type CacheRegion = "FROZEN_PREFIX" | "SESSION_PREFIX" | "LIVE_ZONE" | "UNCACHED";
+export type ContextTrust = "TRUSTED" | "UNTRUSTED_WORKSPACE" | "EXTERNAL";
+
+export interface ContextRecoveryRef {
+  artifact_id: string;
+  sha256: string;
+  original_bytes: number;
+  token_estimate: number;
+  media_type: string;
+  recovery: RecoveryMode;
+}
+export interface ContextSegment {
+  id: string;
+  kind: ContextKind;
+  source: string;
+  trust: ContextTrust;
+  stability: ContextStability;
+  priority: number;
+  sensitivity: string;
+  recovery: RecoveryMode;
+  cache_region: CacheRegion;
+  lifecycle: string;
+  ttl_turns?: number | null;
+  provenance_digest: string;
+  token_cost: number;
+  body_ref: unknown;
+}
+export interface ContextEnvelope {
+  schema_version: 1;
+  epoch: string;
+  segments: ContextSegment[];
+}
+export type EventDurability = "DURABLE" | "TRANSIENT" | "STREAM_START" | "STREAM_DELTA" | "STREAM_ABORT" | "SYNC" | "ERROR";
+export interface AgentEvent {
+  event_id: string;
+  conversation_id: string;
+  turn_id: string;
+  parent_event_id?: string | null;
+  seq: number;
+  kind: string;
+  source: string;
+  timestamp: number;
+  payload: unknown;
+  durability: EventDurability;
+}
+export interface ExecutionBudget {
+  max_model_calls: number;
+  max_input_tokens: number;
+  max_output_tokens: number;
+  max_total_tokens: number;
+  max_cost: number;
+  max_duration_ms: number;
+  max_tool_calls: number;
+  max_subagents: number;
+}
+export interface BudgetLease {
+  id: string;
+  parent_budget_id: string;
+  child_agent_id: string;
+  token_cap: number;
+  call_cap: number;
+  cost_cap: number;
+  reserved: Record<string, unknown>;
+  consumed: Record<string, unknown>;
+}
+export interface ExecutionAuthoritySnapshot {
+  policy_revision: string;
+  autonomy_revision: string;
+  approval_revision: string;
+  workspace_id: string;
+  conversation_id: string;
+  turn_id: string;
+  sandbox_profile: string;
+  filesystem_caps: string[];
+  network_caps: string[];
+  executable_identity: string;
+  approval_grant?: Record<string, unknown> | null;
+}
+export interface ContextEpoch {
+  epoch_id: string;
+  baseline_seq: number;
+  memory_revision: string;
+  repository_revision: string;
+  skills_revision: string;
+  plugins_revision: string;
+  policy_revision: string;
+  provider_revision: string;
+  snapshot_digest: string;
+}
+export interface CompactionCheckpoint {
+  objective: string;
+  constraints: string[];
+  decisions: string[];
+  completed: string[];
+  active: string[];
+  blocked: string[];
+  next_actions: string[];
+  relevant_files: string[];
+  validation_state: string[];
+  recovery_refs: ContextRecoveryRef[];
+}
+export interface AgentLineage {
+  agent_id: string;
+  parent_agent_id?: string | null;
+  parent_turn_id: string;
+  root_task_id: string;
+  generation: number;
+  role: string;
+  backend: string;
+  model: string;
+  context_fork_mode: string;
+  isolation_mode: "WORKTREE" | "SHARED" | "RUNTIME";
+  budget_lease_id: string;
+}
+export interface WorkspaceSnapshot {
+  snapshot_id: string;
+  parent_snapshot_id?: string | null;
+  turn_id: string;
+  created_at: number;
+  changed_paths: string[];
+  digest: string;
+}
+export interface MemoryConsumptionReceipt {
+  recall_trace_id: string;
+  memory_id: string;
+  consumer: string;
+  purpose: string;
+  presented: boolean;
+  referenced: boolean;
+  used_for_action: boolean;
+  outcome: string;
+  turn_id: string;
+  consumed_at: number;
+}
+export interface MemoryJob {
+  id: string;
+  phase: string;
+  source_id: string;
+  source_revision: string;
+  source_watermark: string;
+  status: string;
+  lease_owner?: string | null;
+  lease_until?: number | null;
+  attempt: number;
+  next_retry_at?: number | null;
+  input_digest: string;
+  output_digest?: string | null;
+  created_at: number;
+  updated_at: number;
+}
