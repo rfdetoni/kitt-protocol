@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 - 2026-09-30
+
+- Add shared `AgentRole` and `MemoryLifecycleEvent` contracts across Rust, Python and TypeScript SDKs.
+- Restore TypeScript parity for saved granular permissions and plugin capability declarations.
+- Keep Envelope protocol v1 unchanged; this patch release aligns the agentic source contracts used by Agent CLI 0.80.1 and Memory 0.6.1.
+
 ## 0.5.0 - 2026-09-30
 
 - Add typed `ContextEnvelope` / `ContextSegment` contracts with trust, lifecycle, recovery and cache semantics.
