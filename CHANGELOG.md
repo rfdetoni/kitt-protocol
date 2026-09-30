@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 - 2026-09-30
+
+- Add typed `ContextEnvelope` / `ContextSegment` contracts with trust, lifecycle, recovery and cache semantics.
+- Add shared agent-event, execution-budget, authority-snapshot, context-epoch, compaction, lineage, snapshot, permissions and plugin-capability contracts.
+- Add durable-memory job and consumption-receipt contracts.
+- Add Rust/Python/TypeScript contract parity and round-trip validation coverage.
+- Keep transport Envelope protocol v1; 0.5.0 is a package/source-contract release.
+
 ## 0.4.0 - 2026-09-28
 
 - Add `memory.manage.request/response` for the dedicated kitt-memory service control plane.

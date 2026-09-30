@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.local/schemas/context-envelope.schema.json",
+  "title": "KITT ContextEnvelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "epoch",
+    "segments"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "epoch": {
+      "type": "string",
+      "minLength": 1
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "source",
+          "trust",
+          "stability",
+          "priority",
+          "sensitivity",
+          "recovery",
+          "cache_region",
+          "lifecycle",
+          "provenance_digest",
+          "token_cost",
+          "body_ref"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "SYSTEM_INSTRUCTION",
+              "USER_INTENT",
+              "MEMORY_RECALL",
+              "MEMORY_CORRECTION",
+              "SKILL",
+              "PROJECT_GUIDELINE",
+              "HARNESS_KNOWLEDGE",
+              "REPOSITORY_MAP",
+              "FILE_EVIDENCE",
+              "SEARCH_EVIDENCE",
+              "TOOL_SCHEMA",
+              "TOOL_RESULT",
+              "TOOL_RECEIPT",
+              "SUBAGENT_RESULT",
+              "VALIDATION_EVIDENCE",
+              "ERROR_EVIDENCE",
+              "COMPACTION_CHECKPOINT",
+              "OUTPUT_CONTRACT"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "trust": {
+            "enum": [
+              "TRUSTED",
+              "UNTRUSTED_WORKSPACE",
+              "EXTERNAL"
+            ]
+          },
+          "stability": {
+            "enum": [
+              "BUILD",
+              "SESSION",
+              "TURN"
+            ]
+          },
+          "priority": {
+            "type": "integer"
+          },
+          "sensitivity": {
+            "type": "string"
+          },
+          "recovery": {
+            "enum": [
+              "NONE",
+              "EXACT",
+              "SOURCE_REF",
+              "RECOMPUTE"
+            ]
+          },
+          "cache_region": {
+            "enum": [
+              "FROZEN_PREFIX",
+              "SESSION_PREFIX",
+              "LIVE_ZONE",
+              "UNCACHED"
+            ]
+          },
+          "lifecycle": {
+            "type": "string"
+          },
+          "ttl_turns": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "provenance_digest": {
+            "type": "string"
+          },
+          "token_cost": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "body_ref": {}
+        }
+      }
+    }
+  }
+}

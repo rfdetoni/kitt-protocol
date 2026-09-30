@@ -227,3 +227,36 @@ Backend IR represents schemas, entities, queries, commands, endpoints, events, w
 ## Memory service control plane (0.4)
 
 The memory hot path remains `memory.remember`, `memory.recall` and `memory.forget`. Package 0.4 adds `memory.manage.request/response` for operations owned by the dedicated memory service, such as status changes, evidence/provenance, dream commits, maintenance and bounded administrative reads. The operation name is interpreted only by a trusted kitt-memory service; callers cannot use it as an arbitrary command execution channel.
+
+## Agentic contracts 0.5
+
+Package 0.5.0 adds the shared contracts used by the agentic control plane without changing Envelope protocol v1. The protocol repository owns data shapes only; orchestration remains in \`kitt-agent-cli\`, durable memory remains in \`kitt-memoryd\`, provider/WebChat transport remains in \`kitt-reverse-proxy\`, and low-level execution remains runtime/toolbox-owned.
+
+### Typed context
+
+\`ContextEnvelope\` replaces semantic rediscovery from textual headings. Every \`ContextSegment\` declares its kind, source, trust level, stability, recovery mode, cache region, lifecycle, provenance digest and token cost. Providers may still receive text after lowering, but the lowering starts from typed segments rather than parsing labels such as \`Memory:\`, \`Repo Map:\` or \`Tool Contract:\`.
+
+Core context kinds include user intent, durable-memory recall, skills, project guidance, repository/file/search evidence, tool schemas/results/receipts, subagent output, validation/error evidence, compaction checkpoints and output contracts.
+
+### Durable execution contracts
+
+The package also defines language-neutral shapes for:
+
+- \`AgentEvent\` and event durability;
+- \`ExecutionBudget\` and child \`BudgetLease\`;
+- immutable \`ExecutionAuthoritySnapshot\`;
+- \`ContextEpoch\` and segment reconciliation;
+- \`ContextRecoveryRef\` and recoverable compaction checkpoints;
+- \`AgentLineage\`, isolation mode and workspace snapshots;
+- saved granular permissions and plugin capabilities;
+- memory jobs and \`MemoryConsumptionReceipt\`.
+
+### Language decision
+
+| Component | Language | Reason | Boundary |
+| --- | --- | --- | --- |
+| Canonical contract/validation | Rust | deterministic serialization, strict enums and low-overhead cross-service validation | JSON / protocol SDK |
+| Agent orchestration SDK | Python | ergonomic control-plane integration; not a CPU hot path | same JSON mapping |
+| Web/provider SDK | TypeScript | native fit for the reverse-proxy transport layer | same JSON mapping |
+
+No domain authority is duplicated in the SDKs: Rust, Python and TypeScript represent the same wire semantics. Performance-sensitive implementations belong to their owning services and require representative benchmarks before a Python→Rust rewrite.
