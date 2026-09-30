@@ -412,6 +412,33 @@ export interface WorkspaceSnapshot {
   changed_paths: string[];
   digest: string;
 }
+export type AgentRole = "DISCOVER" | "ARCHITECT" | "IMPLEMENT" | "VERIFY" | "REVIEW";
+export interface SavedPermission {
+  workspace_id: string;
+  action: string;
+  resource_pattern: string;
+  executable_identity?: string | null;
+  decision: "ALLOW" | "ASK" | "DENY";
+}
+export interface PluginCapabilities {
+  tools: string[];
+  providers: string[];
+  skills: string[];
+  hooks: string[];
+  commands: string[];
+  context_sources: string[];
+  ui_extensions: string[];
+}
+export interface MemoryLifecycleEvent {
+  event: string;
+  namespace: string;
+  workspace_id: string;
+  source_id: string;
+  source_revision: string;
+  input_digest: string;
+  source_kind: string;
+  source_watermark: string;
+}
 export interface MemoryConsumptionReceipt {
   recall_trace_id: string;
   memory_id: string;
