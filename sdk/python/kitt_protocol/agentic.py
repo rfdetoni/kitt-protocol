@@ -208,6 +208,24 @@ class WorkspaceSnapshot:
     digest: str
     parent_snapshot_id: str | None = None
 
+class AgentRole(StrEnum):
+    DISCOVER = "DISCOVER"
+    ARCHITECT = "ARCHITECT"
+    IMPLEMENT = "IMPLEMENT"
+    VERIFY = "VERIFY"
+    REVIEW = "REVIEW"
+
+@dataclass(frozen=True)
+class MemoryLifecycleEvent:
+    event: str
+    namespace: str
+    workspace_id: str
+    source_id: str
+    source_revision: str
+    input_digest: str
+    source_kind: str = "external"
+    source_watermark: str = ""
+
 @dataclass(frozen=True)
 class SavedPermission:
     workspace_id: str
