@@ -2,6 +2,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
 
+mod agentic;
+pub use agentic::*;
+
 mod multillm;
 pub use multillm::{
     ModelRoute, ModelTier, RoutedAskRequest, RoutedAskResponse, TranscribeRequest,
