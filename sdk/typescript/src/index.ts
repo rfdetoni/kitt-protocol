@@ -323,6 +323,14 @@ export interface ContextEnvelope {
   segments: ContextSegment[];
 }
 export type EventDurability = "DURABLE" | "TRANSIENT" | "STREAM_START" | "STREAM_DELTA" | "STREAM_ABORT" | "SYNC" | "ERROR";
+export interface KittRequestMetadata {
+  conversation_id: string;
+  turn_id: string;
+  request_id: string;
+  route: string;
+  session_id?: string | null;
+}
+
 export interface AgentEvent {
   event_id: string;
   conversation_id: string;
