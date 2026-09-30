@@ -29,19 +29,37 @@ pub enum ContextKind {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum ContextStability { Build, Session, Turn }
+pub enum ContextStability {
+    Build,
+    Session,
+    Turn,
+}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum RecoveryMode { None, Exact, SourceRef, Recompute }
+pub enum RecoveryMode {
+    None,
+    Exact,
+    SourceRef,
+    Recompute,
+}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum CacheRegion { FrozenPrefix, SessionPrefix, LiveZone, Uncached }
+pub enum CacheRegion {
+    FrozenPrefix,
+    SessionPrefix,
+    LiveZone,
+    Uncached,
+}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum ContextTrust { Trusted, UntrustedWorkspace, External }
+pub enum ContextTrust {
+    Trusted,
+    UntrustedWorkspace,
+    External,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -85,7 +103,10 @@ pub struct ContextEnvelope {
 impl ContextEnvelope {
     pub fn validate(&self) -> Result<(), String> {
         if self.schema_version != AGENTIC_SCHEMA_VERSION {
-            return Err(format!("unsupported agentic schema version {}", self.schema_version));
+            return Err(format!(
+                "unsupported agentic schema version {}",
+                self.schema_version
+            ));
         }
         if self.epoch.trim().is_empty() {
             return Err("context epoch is empty".into());
@@ -136,7 +157,14 @@ pub struct AgentEvent {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum RunState { Idle, Running, Stopping, FollowupPending, Paused, Failed }
+pub enum RunState {
+    Idle,
+    Running,
+    Stopping,
+    FollowupPending,
+    Paused,
+    Failed,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -166,7 +194,11 @@ pub struct BudgetLease {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum PolicyDecision { Allow, Ask, Deny }
+pub enum PolicyDecision {
+    Allow,
+    Ask,
+    Deny,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -201,7 +233,12 @@ pub struct ContextEpoch {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum SegmentDisposition { Unchanged, Reconciled, Replaced, Invalidated }
+pub enum SegmentDisposition {
+    Unchanged,
+    Reconciled,
+    Replaced,
+    Invalidated,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -220,11 +257,21 @@ pub struct CompactionCheckpoint {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum RuntimeBackend { Local, Docker, Podman, Kubernetes, Remote }
+pub enum RuntimeBackend {
+    Local,
+    Docker,
+    Podman,
+    Kubernetes,
+    Remote,
+}
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum IsolationMode { Worktree, Shared, Runtime }
+pub enum IsolationMode {
+    Worktree,
+    Shared,
+    Runtime,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -257,7 +304,13 @@ pub struct WorkspaceSnapshot {
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
-pub enum AgentRole { Discover, Architect, Implement, Verify, Review }
+pub enum AgentRole {
+    Discover,
+    Architect,
+    Implement,
+    Verify,
+    Review,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
