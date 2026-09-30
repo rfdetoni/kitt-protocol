@@ -127,6 +127,34 @@ class ProtocolModelsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             ContextEnvelope(epoch="epoch-1", segments=(segment, segment))
 
+    def test_request_metadata_is_structured_and_validated(self):
+        from kitt_protocol import KittRequestMetadata
+
+        metadata = KittRequestMetadata(
+            conversation_id="conversation-1",
+            turn_id="turn-1",
+            request_id="request-1",
+            route="agent-loop",
+            session_id="session-1",
+        )
+        self.assertEqual(
+            {
+                "conversation_id": "conversation-1",
+                "turn_id": "turn-1",
+                "request_id": "request-1",
+                "route": "agent-loop",
+                "session_id": "session-1",
+            },
+            metadata.to_mapping(),
+        )
+        with self.assertRaises(ValueError):
+            KittRequestMetadata(
+                conversation_id="",
+                turn_id="turn-1",
+                request_id="request-1",
+                route="agent-loop",
+            )
+
     def test_authenticated_frame_hides_token_in_repr(self):
         frame = AuthenticatedFrame(
             token="super-secret",
