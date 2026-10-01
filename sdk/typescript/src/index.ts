@@ -144,6 +144,7 @@ export interface MemoryTimelineRequest {
 export interface MemoryGetRequest {
   namespace: string;
   workspace_id: string;
+  scope_key?: string | null;
   ids: string[];
   token_budget?: number;
   allow_private?: boolean;
