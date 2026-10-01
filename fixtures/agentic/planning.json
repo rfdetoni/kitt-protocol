@@ -1,0 +1,6 @@
+{
+  "metadata": {"conversation_id":"conv-1","turn_id":"turn-1","request_id":"request-1","route":"agent-loop","agent_role":"VERIFY","parent_request_id":"parent-1","task_id":"task-1"},
+  "host_execution": {"schema_version":1,"conversation_id":"conv-1","turn_id":"turn-1","tool_call_count":3,"mutation_count":1,"verified_mutation_count":1,"discovery_observed":true,"validation_observed":true,"completion_ready":false},
+  "proposal": {"schema_version":1,"objective":"Corrigir e verificar","tasks":[{"local_id":"t1","title":"Corrigir a aplicação","depends_on":[],"check_ids":["node.typecheck"],"paths":["src/app.ts"],"role":"IMPLEMENT"}]},
+  "report": {"schema_version":1,"task_id":"task-1","child_id":"child-1","status":"COMPLETED","artifacts":["artifact-1"],"evidence":["execution-1"],"blockers":[]}
+}

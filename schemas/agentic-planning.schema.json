@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.dev/schemas/agentic-planning.schema.json",
+  "title": "KITT host planning contracts v1",
+  "$defs": {
+    "KittRequestMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "conversation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "turn_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "route": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "parent_request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "agent_role": {
+          "enum": [
+            "DISCOVER",
+            "ARCHITECT",
+            "IMPLEMENT",
+            "VERIFY",
+            "REVIEW"
+          ]
+        }
+      },
+      "required": [
+        "conversation_id",
+        "turn_id",
+        "request_id",
+        "route"
+      ]
+    },
+    "HostExecutionState": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "conversation_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "turn_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "tool_call_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "mutation_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "verified_mutation_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "discovery_observed": {
+          "type": "boolean"
+        },
+        "validation_observed": {
+          "type": "boolean"
+        },
+        "completion_ready": {
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "conversation_id",
+        "turn_id",
+        "tool_call_count",
+        "mutation_count",
+        "verified_mutation_count",
+        "discovery_observed",
+        "validation_observed",
+        "completion_ready",
+        "schema_version"
+      ]
+    },
+    "PlanTaskProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "local_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "depends_on": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxItems": 12,
+          "uniqueItems": true
+        },
+        "check_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxItems": 24,
+          "uniqueItems": true
+        },
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "role": {
+          "enum": [
+            "DISCOVER",
+            "ARCHITECT",
+            "IMPLEMENT",
+            "VERIFY",
+            "REVIEW"
+          ]
+        }
+      },
+      "required": [
+        "local_id",
+        "title",
+        "role"
+      ]
+    },
+    "PlanProposal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "tasks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/PlanTaskProposal"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "objective",
+        "tasks"
+      ]
+    },
+    "SubagentReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "task_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "child_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "status": {
+          "enum": [
+            "COMPLETED",
+            "FAILED",
+            "CANCELLED",
+            "TIMED_OUT"
+          ]
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "schema_version",
+        "task_id",
+        "child_id",
+        "status",
+        "artifacts",
+        "evidence",
+        "blockers"
+      ]
+    }
+  }
+}

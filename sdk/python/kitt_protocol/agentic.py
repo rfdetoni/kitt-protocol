@@ -165,6 +165,9 @@ class KittRequestMetadata:
     request_id: str
     route: str
     session_id: str | None = None
+    agent_role: str | None = None
+    parent_request_id: str | None = None
+    task_id: str | None = None
 
     def __post_init__(self) -> None:
         for name in ("conversation_id", "turn_id", "request_id", "route"):
@@ -172,6 +175,12 @@ class KittRequestMetadata:
                 raise ValueError(f"{name} is required")
         if self.session_id is not None and not str(self.session_id).strip():
             raise ValueError("session_id must be non-empty when present")
+        for name in ("conversation_id", "turn_id", "request_id", "session_id", "parent_request_id", "task_id"):
+            value = getattr(self, name)
+            if value is not None and (not isinstance(value, str) or not value.strip() or len(value) > 256):
+                raise ValueError(f"{name} must be a non-empty string up to 256 characters")
+        if self.agent_role is not None:
+            AgentRole(self.agent_role)
 
     def to_mapping(self) -> dict[str, Any]:
         return _wire(self)
@@ -321,6 +330,75 @@ class AgentRole(StrEnum):
     IMPLEMENT = "IMPLEMENT"
     VERIFY = "VERIFY"
     REVIEW = "REVIEW"
+
+class VerificationStatus(StrEnum):
+    PASS = "PASS"
+    FAIL = "FAIL"
+    SKIPPED = "SKIPPED"
+    UNAVAILABLE = "UNAVAILABLE"
+    NOT_APPLICABLE = "NOT_APPLICABLE"
+    CANCELLED = "CANCELLED"
+    TIMED_OUT = "TIMED_OUT"
+
+@dataclass(frozen=True)
+class HostExecutionState:
+    """Host-produced facts; model output and stdout cannot attest these fields."""
+    conversation_id: str
+    turn_id: str
+    tool_call_count: int = 0
+    mutation_count: int = 0
+    verified_mutation_count: int = 0
+    discovery_observed: bool = False
+    validation_observed: bool = False
+    completion_ready: bool = True
+    schema_version: int = 1
+
+    def __post_init__(self) -> None:
+        if self.schema_version != 1 or not self.conversation_id.strip() or not self.turn_id.strip():
+            raise ValueError("Invalid host execution identity or schema")
+        for name in ("tool_call_count", "mutation_count", "verified_mutation_count"):
+            value = getattr(self, name)
+            if type(value) is not int or not 0 <= value <= 2**53 - 1:
+                raise ValueError(f"Invalid {name}")
+        for name in ("discovery_observed", "validation_observed", "completion_ready"):
+            if type(getattr(self, name)) is not bool:
+                raise ValueError(f"Invalid {name}")
+        if self.verified_mutation_count > self.mutation_count:
+            raise ValueError("Verified mutation count exceeds mutation count")
+
+    def to_mapping(self) -> dict[str, Any]:
+        return _wire(self)
+
+@dataclass(frozen=True)
+class PlanTaskProposal:
+    local_id: str
+    title: str
+    depends_on: tuple[str, ...] = ()
+    check_ids: tuple[str, ...] = ()
+    paths: tuple[str, ...] = ()
+    role: AgentRole = AgentRole.IMPLEMENT
+
+@dataclass(frozen=True)
+class PlanProposal:
+    objective: str
+    tasks: tuple[PlanTaskProposal, ...]
+    schema_version: int = 1
+
+    def to_mapping(self) -> dict[str, Any]:
+        return _wire(self)
+
+@dataclass(frozen=True)
+class SubagentReport:
+    task_id: str
+    child_id: str
+    status: str
+    artifacts: tuple[str, ...] = ()
+    evidence: tuple[str, ...] = ()
+    blockers: tuple[str, ...] = ()
+    schema_version: int = 1
+
+    def to_mapping(self) -> dict[str, Any]:
+        return _wire(self)
 
 @dataclass(frozen=True)
 class MemoryLifecycleEvent:

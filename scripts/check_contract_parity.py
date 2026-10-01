@@ -130,8 +130,27 @@ def required_memory_remember_fields() -> None:
             fail(f"Rust MemoryRememberRequest.{field} must be required")
 
 
+def agentic_planning_fields() -> None:
+    python_module = ast.parse(read("sdk/python/kitt_protocol/agentic.py"))
+    rust = read("src/agentic.rs")
+    ts = read("sdk/typescript/src/index.ts")
+    schema = json.loads(read("schemas/agentic-planning.schema.json"))["$defs"]
+    for name in ("KittRequestMetadata", "HostExecutionState", "PlanTaskProposal", "PlanProposal", "SubagentReport"):
+        cls = next(n for n in python_module.body if isinstance(n, ast.ClassDef) and n.name == name)
+        py_fields = {n.target.id for n in cls.body if isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name)}
+        rust_block = re.search(rf"pub struct {name} \{{([^}}]+)\}}", rust).group(1)
+        ts_block = re.search(rf"export interface {name} \{{([^}}]+)\}}", ts).group(1)
+        compare(name,
+            ("python", py_fields),
+            ("rust", set(re.findall(r"pub (\w+):", rust_block))),
+            ("typescript", set(re.findall(r"(\w+)\??\s*:", ts_block))),
+            ("schema", set(schema[name]["properties"])),
+        )
+
+
 def main() -> int:
     required_memory_remember_fields()
+    agentic_planning_fields()
     compare(
         "message kinds",
         ("rust", rust_kinds()),

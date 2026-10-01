@@ -422,6 +422,9 @@ export interface KittRequestMetadata {
   request_id: string;
   route: string;
   session_id?: string | null;
+  agent_role?: AgentRole | null;
+  parent_request_id?: string | null;
+  task_id?: string | null;
 }
 
 export interface AgentEvent {
@@ -599,4 +602,27 @@ export interface MemoryJob {
   output_digest?: string | null;
   created_at: number;
   updated_at: number;
+}
+
+/** Host facts: never derive these from model output or tool stdout. */
+export interface HostExecutionState {
+  schema_version: 1;
+  conversation_id: string;
+  turn_id: string;
+  tool_call_count: number;
+  mutation_count: number;
+  verified_mutation_count: number;
+  discovery_observed: boolean;
+  validation_observed: boolean;
+  completion_ready: boolean;
+}
+export type VerificationStatus = "PASS" | "FAIL" | "SKIPPED" | "UNAVAILABLE" | "NOT_APPLICABLE" | "CANCELLED" | "TIMED_OUT";
+export interface PlanTaskProposal {
+  local_id: string; title: string; role: AgentRole;
+  depends_on: string[]; check_ids: string[]; paths: string[];
+}
+export interface PlanProposal { schema_version: 1; objective: string; tasks: PlanTaskProposal[]; }
+export interface SubagentReport {
+  schema_version: 1; task_id: string; child_id: string; status: string;
+  artifacts: string[]; evidence: string[]; blockers: string[];
 }

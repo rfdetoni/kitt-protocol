@@ -13,7 +13,7 @@
 
 K.I.T.T. Protocol defines the external contracts used between independently packaged K.I.T.T. components. Canonical JSON Schemas are paired with small SDKs so the Agent, Assistant, Memory, workers and native services can evolve without duplicating transport logic or coupling their implementations.
 
-Protocol **0.6.0** keeps Envelope protocol v1 and completes the shared contracts required by the agentic runtime. Memory now has progressive `search/timeline/get` messages with explicit token budgets; conversation runtime bindings, context-segment reconciliation and tool-execution receipts are shared value contracts rather than Agent-local DTOs. `KittRequestMetadata`, typed ContextEnvelope data, tools and correlation remain structural rather than prompt-derived.
+Protocol **0.7.0** keeps Envelope protocol v1 and completes the shared contracts required by the agentic runtime. Memory now has progressive `search/timeline/get` messages with explicit token budgets; conversation runtime bindings, context-segment reconciliation and tool-execution receipts are shared value contracts rather than Agent-local DTOs. `KittRequestMetadata`, typed ContextEnvelope data, tools and correlation remain structural rather than prompt-derived.
 
 ---
 
@@ -276,3 +276,9 @@ The package also defines language-neutral shapes for:
 | Web/provider SDK | TypeScript | native fit for the reverse-proxy transport layer | same JSON mapping |
 
 No domain authority is duplicated in the SDKs: Rust, Python and TypeScript represent the same wire semantics. Performance-sensitive implementations belong to their owning services and require representative benchmarks before a Python→Rust rewrite.
+
+## Host planning contracts
+
+`HostExecutionState`, `PlanProposal`, `PlanTaskProposal`, `SubagentReport` and `VerificationStatus` are shared in all three SDKs. The schema is [schemas/agentic-planning.schema.json](schemas/agentic-planning.schema.json); the common wire fixture is [fixtures/agentic/planning.json](fixtures/agentic/planning.json). `KittRequestMetadata` supports `agent_role`, `parent_request_id` and `task_id`. Existing roles remain DISCOVER, ARCHITECT, IMPLEMENT, VERIFY and REVIEW.
+
+The executing host produces facts and assigns task IDs. A proposal, a child report, a stdout success marker or a metadata role does not grant permissions or prove completion. DAG admission, exact registered checks, budget leases, approval and evidence freshness belong to Agent CLI. Reverse Proxy transports the typed state and rejects cross-turn host facts.

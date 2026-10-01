@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 - 2026-10-01
+
+- Add shared host execution facts, bounded plan proposals, task roles and subagent reports across Rust, Python and TypeScript.
+- Extend request metadata with optional role, parent request and task correlation.
+- Add a shared planning JSON schema, wire fixture, malformed input tests and cross-SDK field parity checks.
+- Preserve transport Envelope v1, ContextEnvelope v1 and existing role names; plans and reports never confer execution authority.
+
 ## 0.6.0 - 2026-10-01
 
 - Add progressive Memory protocol messages: `memory.search`, `memory.timeline` and `memory.get`, with explicit token budgets instead of fixed-count recall as the primary sizing control.

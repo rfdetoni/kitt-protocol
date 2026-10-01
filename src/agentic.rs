@@ -148,6 +148,12 @@ pub struct KittRequestMetadata {
     pub route: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub session_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub agent_role: Option<AgentRole>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub parent_request_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub task_id: Option<String>,
 }
 
 impl KittRequestMetadata {
@@ -168,6 +174,20 @@ impl KittRequestMetadata {
             .is_some_and(|value| value.trim().is_empty())
         {
             return Err("session_id must be non-empty when present".into());
+        }
+        for (name, value) in [
+            ("conversation_id", Some(self.conversation_id.as_str())),
+            ("turn_id", Some(self.turn_id.as_str())),
+            ("request_id", Some(self.request_id.as_str())),
+            ("session_id", self.session_id.as_deref()),
+            ("parent_request_id", self.parent_request_id.as_deref()),
+            ("task_id", self.task_id.as_deref()),
+        ] {
+            if value.is_some_and(|v| v.trim().is_empty() || v.chars().count() > 256) {
+                return Err(format!(
+                    "{name} must be a non-empty string up to 256 characters"
+                ));
+            }
         }
         Ok(())
     }
@@ -519,6 +539,9 @@ mod tests {
             request_id: "request-1".into(),
             route: "agent-loop".into(),
             session_id: Some("session-1".into()),
+            agent_role: Some(AgentRole::Implement),
+            parent_request_id: Some("parent-1".into()),
+            task_id: Some("task-1".into()),
         };
         metadata.validate().unwrap();
         let wire = serde_json::to_vec(&metadata).unwrap();
@@ -587,5 +610,88 @@ mod tests {
             segments: vec![segment.clone(), segment],
         };
         assert!(envelope.validate().is_err());
+    }
+}
+
+/// Facts produced by the executing host, never inferred from model text.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct HostExecutionState {
+    pub schema_version: u32,
+    pub conversation_id: String,
+    pub turn_id: String,
+    pub tool_call_count: u64,
+    pub mutation_count: u64,
+    pub verified_mutation_count: u64,
+    pub discovery_observed: bool,
+    pub validation_observed: bool,
+    pub completion_ready: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum VerificationStatus {
+    Pass,
+    Fail,
+    Skipped,
+    Unavailable,
+    NotApplicable,
+    Cancelled,
+    TimedOut,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PlanTaskProposal {
+    pub local_id: String,
+    pub title: String,
+    #[serde(default)]
+    pub depends_on: Vec<String>,
+    #[serde(default)]
+    pub check_ids: Vec<String>,
+    #[serde(default)]
+    pub paths: Vec<String>,
+    pub role: AgentRole,
+}
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct PlanProposal {
+    pub schema_version: u32,
+    pub objective: String,
+    pub tasks: Vec<PlanTaskProposal>,
+}
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct SubagentReport {
+    pub schema_version: u32,
+    pub task_id: String,
+    pub child_id: String,
+    pub status: String,
+    pub artifacts: Vec<String>,
+    pub evidence: Vec<String>,
+    pub blockers: Vec<String>,
+}
+
+#[cfg(test)]
+mod planning_fixture_tests {
+    use super::*;
+    #[test]
+    fn shared_planning_fixture_round_trips() {
+        let fixture: Value =
+            serde_json::from_str(include_str!("../fixtures/agentic/planning.json")).unwrap();
+        let meta: KittRequestMetadata =
+            serde_json::from_value(fixture["metadata"].clone()).unwrap();
+        meta.validate().unwrap();
+        assert_eq!(serde_json::to_value(meta).unwrap(), fixture["metadata"]);
+        let host: HostExecutionState =
+            serde_json::from_value(fixture["host_execution"].clone()).unwrap();
+        assert_eq!(
+            serde_json::to_value(host).unwrap(),
+            fixture["host_execution"]
+        );
+        let plan: PlanProposal = serde_json::from_value(fixture["proposal"].clone()).unwrap();
+        assert_eq!(serde_json::to_value(plan).unwrap(), fixture["proposal"]);
+        let report: SubagentReport = serde_json::from_value(fixture["report"].clone()).unwrap();
+        assert_eq!(serde_json::to_value(report).unwrap(), fixture["report"]);
     }
 }

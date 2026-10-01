@@ -35,3 +35,10 @@ for (const file of fixtures) {
   }
 }
 console.log(`validated ${fixtures.length} protocol fixtures`);
+
+const planning = JSON.parse(readFileSync('fixtures/agentic/planning.json', 'utf8'));
+if (planning.metadata.agent_role !== 'VERIFY' || planning.host_execution.schema_version !== 1
+    || planning.proposal.tasks[0].role !== 'IMPLEMENT' || planning.report.task_id !== planning.metadata.task_id) {
+  throw new Error('invalid shared planning fixture');
+}
+console.log('validated shared planning wire fixture');
