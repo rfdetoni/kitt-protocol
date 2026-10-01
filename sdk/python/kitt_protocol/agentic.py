@@ -48,6 +48,53 @@ class ContextTrust(StrEnum):
     UNTRUSTED_WORKSPACE = "UNTRUSTED_WORKSPACE"
     EXTERNAL = "EXTERNAL"
 
+class EventDurability(StrEnum):
+    DURABLE = "DURABLE"
+    TRANSIENT = "TRANSIENT"
+    STREAM_START = "STREAM_START"
+    STREAM_DELTA = "STREAM_DELTA"
+    STREAM_ABORT = "STREAM_ABORT"
+    SYNC = "SYNC"
+    ERROR = "ERROR"
+
+class RunState(StrEnum):
+    IDLE = "IDLE"
+    RUNNING = "RUNNING"
+    STOPPING = "STOPPING"
+    FOLLOWUP_PENDING = "FOLLOWUP_PENDING"
+    PAUSED = "PAUSED"
+    FAILED = "FAILED"
+
+class SegmentDisposition(StrEnum):
+    UNCHANGED = "UNCHANGED"
+    RECONCILED = "RECONCILED"
+    REPLACED = "REPLACED"
+    INVALIDATED = "INVALIDATED"
+
+class RuntimeBackend(StrEnum):
+    LOCAL = "LOCAL"
+    DOCKER = "DOCKER"
+    PODMAN = "PODMAN"
+    KUBERNETES = "KUBERNETES"
+    REMOTE = "REMOTE"
+
+class IsolationMode(StrEnum):
+    WORKTREE = "WORKTREE"
+    SHARED = "SHARED"
+    RUNTIME = "RUNTIME"
+
+class EvidenceOrigin(StrEnum):
+    HUMAN = "HUMAN"
+    ASSISTANT = "ASSISTANT"
+    SUBAGENT = "SUBAGENT"
+    TOOL = "TOOL"
+    REPOSITORY = "REPOSITORY"
+    MEMORY = "MEMORY"
+    SKILL = "SKILL"
+    PLUGIN = "PLUGIN"
+    HARNESS = "HARNESS"
+    SYSTEM = "SYSTEM"
+
 def _wire(value: Any) -> Any:
     if isinstance(value, StrEnum):
         return value.value
@@ -140,7 +187,7 @@ class AgentEvent:
     source: str
     timestamp: int
     payload: dict[str, Any]
-    durability: str = "DURABLE"
+    durability: EventDurability = EventDurability.DURABLE
     parent_event_id: str | None = None
 
 @dataclass(frozen=True)
@@ -192,6 +239,47 @@ class ContextEpoch:
     snapshot_digest: str
 
 @dataclass(frozen=True)
+class ContextSegmentReconciliation:
+    segment_id: str
+    disposition: SegmentDisposition
+    reason: str = ""
+
+
+@dataclass(frozen=True)
+class ToolExecutionReceipt:
+    execution_id: str
+    tool_call_id: str
+    conversation_id: str
+    turn_id: str
+    tool_name: str
+    arguments_digest: str
+    state: str
+    result_event_id: str | None = None
+
+
+@dataclass(frozen=True)
+class ConversationRuntimeBinding:
+    conversation_id: str
+    backend: RuntimeBackend
+    runtime_id: str
+    state: str
+    workspace_ref: str
+    config_digest: str
+    created_at: int
+    updated_at: int
+
+
+@dataclass(frozen=True)
+class ExecutionResourceRef:
+    kind: str
+    identity: str
+
+    @property
+    def resource_id(self) -> str:
+        return f"{self.kind}:{self.identity}"
+
+
+@dataclass(frozen=True)
 class CompactionCheckpoint:
     objective: str
     constraints: tuple[str, ...] = ()
@@ -214,7 +302,7 @@ class AgentLineage:
     backend: str
     model: str
     context_fork_mode: str
-    isolation_mode: str
+    isolation_mode: IsolationMode
     budget_lease_id: str
     parent_agent_id: str | None = None
 
