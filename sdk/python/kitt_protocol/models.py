@@ -289,9 +289,15 @@ class MemorySearchResponse:
 
 
 @dataclass(frozen=True)
+class MemoryHydratedRecord:
+    record: dict[str, Any]
+    provenance: tuple["ResourceRef", ...] = ()
+
+
+@dataclass(frozen=True)
 class MemoryGetResponse:
     recall_trace_id: str
-    records: tuple[dict[str, Any], ...]
+    records: tuple[MemoryHydratedRecord, ...]
     consumed_tokens: int
     truncated_ids: tuple[str, ...] = ()
 
