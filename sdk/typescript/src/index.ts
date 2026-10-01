@@ -451,6 +451,38 @@ export interface ContextEpoch {
   provider_revision: string;
   snapshot_digest: string;
 }
+export type SegmentDisposition = "UNCHANGED" | "RECONCILED" | "REPLACED" | "INVALIDATED";
+export type RuntimeBackend = "LOCAL" | "DOCKER" | "PODMAN" | "KUBERNETES" | "REMOTE";
+export interface ContextSegmentReconciliation {
+  segment_id: string;
+  disposition: SegmentDisposition;
+  reason?: string;
+}
+export interface ToolExecutionReceipt {
+  execution_id: string;
+  tool_call_id: string;
+  conversation_id: string;
+  turn_id: string;
+  tool_name: string;
+  arguments_digest: string;
+  state: string;
+  result_event_id?: string | null;
+}
+export interface ConversationRuntimeBinding {
+  conversation_id: string;
+  backend: RuntimeBackend;
+  runtime_id: string;
+  state: string;
+  workspace_ref: string;
+  config_digest: string;
+  created_at: number;
+  updated_at: number;
+}
+export interface ExecutionResourceRef {
+  kind: string;
+  identity: string;
+}
+
 export interface CompactionCheckpoint {
   objective: string;
   constraints: string[];
