@@ -139,6 +139,8 @@ export interface MemoryTimelineRequest {
   around?: number | null;
   limit?: number;
   token_budget?: number;
+  allow_private?: boolean;
+  allow_secret?: boolean;
 }
 
 export interface MemoryGetRequest {
