@@ -155,6 +155,43 @@ class ProtocolModelsTest(unittest.TestCase):
                 route="agent-loop",
             )
 
+    def test_progressive_memory_contracts_are_budgeted(self):
+        from kitt_protocol import (
+            MEMORY_GET_REQUEST,
+            MEMORY_SEARCH_REQUEST,
+            MEMORY_TIMELINE_REQUEST,
+            MemoryGetRequest,
+            MemorySearchRequest,
+            MemoryTimelineRequest,
+        )
+
+        search = MemorySearchRequest(
+            namespace="agent-cli",
+            workspace_id="ws",
+            query="database rule",
+            max_results=12,
+            token_budget=256,
+        )
+        timeline = MemoryTimelineRequest(
+            namespace="agent-cli",
+            workspace_id="ws",
+            source_id="session-1",
+            token_budget=128,
+        )
+        get = MemoryGetRequest(
+            namespace="agent-cli",
+            workspace_id="ws",
+            ids=("mem-1", "mem-2"),
+            token_budget=512,
+        )
+
+        self.assertEqual("memory.search.request", MEMORY_SEARCH_REQUEST)
+        self.assertEqual("memory.timeline.request", MEMORY_TIMELINE_REQUEST)
+        self.assertEqual("memory.get.request", MEMORY_GET_REQUEST)
+        self.assertEqual(256, search.token_budget)
+        self.assertEqual("session-1", timeline.source_id)
+        self.assertEqual(("mem-1", "mem-2"), get.ids)
+
     def test_authenticated_frame_hides_token_in_repr(self):
         frame = AuthenticatedFrame(
             token="super-secret",
