@@ -436,9 +436,17 @@ pub struct MemorySearchResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct MemoryHydratedRecord {
+    pub record: MemoryDto,
+    #[serde(default)]
+    pub provenance: Vec<ResourceRef>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct MemoryGetResponse {
     pub recall_trace_id: String,
-    pub records: Vec<MemoryDto>,
+    pub records: Vec<MemoryHydratedRecord>,
     pub consumed_tokens: u64,
     #[serde(default)]
     pub truncated_ids: Vec<String>,
