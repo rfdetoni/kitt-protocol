@@ -17,6 +17,12 @@ export const KINDS = {
   MEMORY_REMEMBER_RESPONSE: "memory.remember.response",
   MEMORY_RECALL_REQUEST: "memory.recall.request",
   MEMORY_RECALL_RESPONSE: "memory.recall.response",
+  MEMORY_SEARCH_REQUEST: "memory.search.request",
+  MEMORY_SEARCH_RESPONSE: "memory.search.response",
+  MEMORY_TIMELINE_REQUEST: "memory.timeline.request",
+  MEMORY_TIMELINE_RESPONSE: "memory.timeline.response",
+  MEMORY_GET_REQUEST: "memory.get.request",
+  MEMORY_GET_RESPONSE: "memory.get.response",
   MEMORY_FORGET_REQUEST: "memory.forget.request",
   MEMORY_FORGET_RESPONSE: "memory.forget.response",
   MEMORY_MANAGE_REQUEST: "memory.manage.request",
@@ -111,6 +117,64 @@ export interface MemoryRecallRequest {
   as_of?: number | null;
   allow_private?: boolean;
   allow_secret?: boolean;
+}
+
+export interface MemorySearchRequest {
+  namespace: string;
+  workspace_id: string;
+  scope_key?: string | null;
+  query?: string;
+  max_results?: number;
+  token_budget?: number;
+  as_of?: number | null;
+  allow_private?: boolean;
+  allow_secret?: boolean;
+}
+
+export interface MemoryTimelineRequest {
+  namespace: string;
+  workspace_id: string;
+  source_id?: string | null;
+  scope_key?: string | null;
+  around?: number | null;
+  limit?: number;
+  token_budget?: number;
+}
+
+export interface MemoryGetRequest {
+  namespace: string;
+  workspace_id: string;
+  ids: string[];
+  token_budget?: number;
+  allow_private?: boolean;
+  allow_secret?: boolean;
+}
+
+export interface MemorySearchHit {
+  id: string;
+  kind: MemoryKind;
+  snippet: string;
+  sensitivity: Sensitivity;
+  scope: MemoryScope;
+  scope_key?: string | null;
+  importance: number;
+  confidence: number;
+  token_estimate: number;
+  provenance?: ResourceRef[];
+}
+
+export interface MemorySearchResponse {
+  recall_trace_id: string;
+  hits: MemorySearchHit[];
+  consumed_tokens: number;
+  has_more: boolean;
+}
+
+export interface MemoryGetResponse {
+  recall_trace_id: string;
+  records: MemoryDto[];
+  consumed_tokens: number;
+  truncated_ids?: string[];
 }
 
 export interface MemoryDto {
