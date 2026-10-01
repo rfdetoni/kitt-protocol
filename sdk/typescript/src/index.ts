@@ -173,9 +173,14 @@ export interface MemorySearchResponse {
   has_more: boolean;
 }
 
+export interface MemoryHydratedRecord {
+  record: MemoryDto;
+  provenance: ResourceRef[];
+}
+
 export interface MemoryGetResponse {
   recall_trace_id: string;
-  records: MemoryDto[];
+  records: MemoryHydratedRecord[];
   consumed_tokens: number;
   truncated_ids?: string[];
 }
