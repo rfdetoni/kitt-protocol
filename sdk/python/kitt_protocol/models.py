@@ -251,6 +251,8 @@ class MemoryTimelineRequest:
     around: int | None = None
     limit: int = 24
     token_budget: int = 1200
+    allow_private: bool = False
+    allow_secret: bool = False
 
 
 @dataclass(frozen=True)
