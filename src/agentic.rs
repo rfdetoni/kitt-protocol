@@ -533,6 +533,37 @@ mod tests {
     }
 
     #[test]
+    fn runtime_and_execution_receipts_round_trip() {
+        let binding = ConversationRuntimeBinding {
+            conversation_id: "conv-1".into(),
+            backend: RuntimeBackend::Docker,
+            runtime_id: "runtime-1".into(),
+            state: "RUNNING".into(),
+            workspace_ref: "workspace-1".into(),
+            config_digest: "abc".into(),
+            created_at: 1,
+            updated_at: 2,
+        };
+        let wire = serde_json::to_vec(&binding).unwrap();
+        let decoded: ConversationRuntimeBinding = serde_json::from_slice(&wire).unwrap();
+        assert_eq!(decoded, binding);
+
+        let receipt = ToolExecutionReceipt {
+            execution_id: "exec-1".into(),
+            tool_call_id: "call-1".into(),
+            conversation_id: "conv-1".into(),
+            turn_id: "turn-1".into(),
+            tool_name: "kitt_runtime".into(),
+            arguments_digest: "digest".into(),
+            state: "COMPLETED".into(),
+            result_event_id: Some("event-1".into()),
+        };
+        let wire = serde_json::to_vec(&receipt).unwrap();
+        let decoded: ToolExecutionReceipt = serde_json::from_slice(&wire).unwrap();
+        assert_eq!(decoded, receipt);
+    }
+
+    #[test]
     fn duplicate_segment_ids_are_rejected() {
         let segment = ContextSegment {
             id: "dup".into(),
