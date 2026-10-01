@@ -24,6 +24,13 @@ Protocol **0.6.0** keeps Envelope protocol v1 and completes the shared contracts
 - `ConversationRuntimeBinding` represents per-conversation LOCAL/DOCKER/PODMAN/KUBERNETES/REMOTE ownership without making a global environment variable authoritative.
 - `ContextSegmentReconciliation` records UNCHANGED/RECONCILED/REPLACED/INVALIDATED decisions between context epochs.
 
+## Agentic 0.6 additions
+
+- `MemorySearchRequest` returns bounded snippets/candidates first; `MemoryGetRequest` hydrates selected records under its own token budget; `MemoryTimelineRequest` provides source/session chronology without overloading semantic search.
+- `ToolExecutionReceipt` gives replay/reconnect a stable execution identity for side-effecting calls.
+- `ConversationRuntimeBinding` represents per-conversation LOCAL/DOCKER/PODMAN/KUBERNETES/REMOTE ownership without making a global environment variable authoritative.
+- `ContextSegmentReconciliation` records UNCHANGED/RECONCILED/REPLACED/INVALIDATED decisions between context epochs.
+
 ## What’s included
 
 - Canonical versioned message envelopes.
