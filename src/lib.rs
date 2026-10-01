@@ -33,6 +33,12 @@ pub mod kinds {
     pub const MEMORY_REMEMBER_RESPONSE: &str = "memory.remember.response";
     pub const MEMORY_RECALL_REQUEST: &str = "memory.recall.request";
     pub const MEMORY_RECALL_RESPONSE: &str = "memory.recall.response";
+    pub const MEMORY_SEARCH_REQUEST: &str = "memory.search.request";
+    pub const MEMORY_SEARCH_RESPONSE: &str = "memory.search.response";
+    pub const MEMORY_TIMELINE_REQUEST: &str = "memory.timeline.request";
+    pub const MEMORY_TIMELINE_RESPONSE: &str = "memory.timeline.response";
+    pub const MEMORY_GET_REQUEST: &str = "memory.get.request";
+    pub const MEMORY_GET_RESPONSE: &str = "memory.get.response";
     pub const MEMORY_FORGET_REQUEST: &str = "memory.forget.request";
     pub const MEMORY_FORGET_RESPONSE: &str = "memory.forget.response";
     pub const MEMORY_MANAGE_REQUEST: &str = "memory.manage.request";
@@ -332,6 +338,104 @@ pub struct MemoryRecallRequest {
 }
 fn default_memory_limit() -> usize {
     6
+}
+
+fn default_memory_max_results() -> usize {
+    24
+}
+fn default_memory_search_budget() -> u64 {
+    1200
+}
+fn default_memory_get_budget() -> u64 {
+    2400
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemorySearchRequest {
+    pub namespace: String,
+    pub workspace_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
+    #[serde(default)]
+    pub query: String,
+    #[serde(default = "default_memory_max_results")]
+    pub max_results: usize,
+    #[serde(default = "default_memory_search_budget")]
+    pub token_budget: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub as_of: Option<i64>,
+    #[serde(default)]
+    pub allow_private: bool,
+    #[serde(default)]
+    pub allow_secret: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryTimelineRequest {
+    pub namespace: String,
+    pub workspace_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub source_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub around: Option<i64>,
+    #[serde(default = "default_memory_max_results")]
+    pub limit: usize,
+    #[serde(default = "default_memory_search_budget")]
+    pub token_budget: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryGetRequest {
+    pub namespace: String,
+    pub workspace_id: String,
+    pub ids: Vec<String>,
+    #[serde(default = "default_memory_get_budget")]
+    pub token_budget: u64,
+    #[serde(default)]
+    pub allow_private: bool,
+    #[serde(default)]
+    pub allow_secret: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemorySearchHit {
+    pub id: String,
+    pub kind: MemoryKind,
+    pub snippet: String,
+    pub sensitivity: Sensitivity,
+    pub scope: MemoryScope,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
+    pub importance: f32,
+    pub confidence: f32,
+    pub token_estimate: u64,
+    #[serde(default)]
+    pub provenance: Vec<ResourceRef>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemorySearchResponse {
+    pub recall_trace_id: String,
+    pub hits: Vec<MemorySearchHit>,
+    pub consumed_tokens: u64,
+    pub has_more: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryGetResponse {
+    pub recall_trace_id: String,
+    pub records: Vec<MemoryDto>,
+    pub consumed_tokens: u64,
+    #[serde(default)]
+    pub truncated_ids: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
