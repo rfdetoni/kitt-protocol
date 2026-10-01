@@ -289,6 +289,29 @@ class MemorySearchResponse:
 
 
 @dataclass(frozen=True)
+class MemoryTimelineHit:
+    id: str
+    kind: str
+    snippet: str
+    updated_at: int
+    sensitivity: str
+    scope: str
+    scope_key: str | None
+    importance: float
+    confidence: float
+    token_estimate: int
+    provenance: tuple["ResourceRef", ...] = ()
+
+
+@dataclass(frozen=True)
+class MemoryTimelineResponse:
+    recall_trace_id: str
+    hits: tuple[MemoryTimelineHit, ...]
+    consumed_tokens: int
+    has_more: bool
+
+
+@dataclass(frozen=True)
 class MemoryHydratedRecord:
     record: dict[str, Any]
     provenance: tuple["ResourceRef", ...] = ()
