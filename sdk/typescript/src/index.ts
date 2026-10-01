@@ -173,6 +173,27 @@ export interface MemorySearchResponse {
   has_more: boolean;
 }
 
+export interface MemoryTimelineHit {
+  id: string;
+  kind: MemoryKind;
+  snippet: string;
+  updated_at: number;
+  sensitivity: Sensitivity;
+  scope: MemoryScope;
+  scope_key?: string | null;
+  importance: number;
+  confidence: number;
+  token_estimate: number;
+  provenance?: ResourceRef[];
+}
+
+export interface MemoryTimelineResponse {
+  recall_trace_id: string;
+  hits: MemoryTimelineHit[];
+  consumed_tokens: number;
+  has_more: boolean;
+}
+
 export interface MemoryHydratedRecord {
   record: MemoryDto;
   provenance: ResourceRef[];
