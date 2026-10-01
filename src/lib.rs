@@ -436,6 +436,33 @@ pub struct MemorySearchResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct MemoryTimelineHit {
+    pub id: String,
+    pub kind: MemoryKind,
+    pub snippet: String,
+    pub updated_at: i64,
+    pub sensitivity: Sensitivity,
+    pub scope: MemoryScope,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
+    pub importance: f32,
+    pub confidence: f32,
+    pub token_estimate: u64,
+    #[serde(default)]
+    pub provenance: Vec<ResourceRef>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryTimelineResponse {
+    pub recall_trace_id: String,
+    pub hits: Vec<MemoryTimelineHit>,
+    pub consumed_tokens: u64,
+    pub has_more: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct MemoryHydratedRecord {
     pub record: MemoryDto,
     #[serde(default)]
