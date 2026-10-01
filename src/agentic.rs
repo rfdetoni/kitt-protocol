@@ -276,6 +276,49 @@ pub enum SegmentDisposition {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
+pub struct ContextSegmentReconciliation {
+    pub segment_id: String,
+    pub disposition: SegmentDisposition,
+    #[serde(default)]
+    pub reason: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ToolExecutionReceipt {
+    pub execution_id: String,
+    pub tool_call_id: String,
+    pub conversation_id: String,
+    pub turn_id: String,
+    pub tool_name: String,
+    pub arguments_digest: String,
+    pub state: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub result_event_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ConversationRuntimeBinding {
+    pub conversation_id: String,
+    pub backend: RuntimeBackend,
+    pub runtime_id: String,
+    pub state: String,
+    pub workspace_ref: String,
+    pub config_digest: String,
+    pub created_at: i64,
+    pub updated_at: i64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct ExecutionResourceRef {
+    pub kind: String,
+    pub identity: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct CompactionCheckpoint {
     pub objective: String,
     pub constraints: Vec<String>,
@@ -487,6 +530,37 @@ mod tests {
             ..metadata
         };
         assert!(invalid.validate().is_err());
+    }
+
+    #[test]
+    fn runtime_and_execution_receipts_round_trip() {
+        let binding = ConversationRuntimeBinding {
+            conversation_id: "conv-1".into(),
+            backend: RuntimeBackend::Docker,
+            runtime_id: "runtime-1".into(),
+            state: "RUNNING".into(),
+            workspace_ref: "workspace-1".into(),
+            config_digest: "abc".into(),
+            created_at: 1,
+            updated_at: 2,
+        };
+        let wire = serde_json::to_vec(&binding).unwrap();
+        let decoded: ConversationRuntimeBinding = serde_json::from_slice(&wire).unwrap();
+        assert_eq!(decoded, binding);
+
+        let receipt = ToolExecutionReceipt {
+            execution_id: "exec-1".into(),
+            tool_call_id: "call-1".into(),
+            conversation_id: "conv-1".into(),
+            turn_id: "turn-1".into(),
+            tool_name: "kitt_runtime".into(),
+            arguments_digest: "digest".into(),
+            state: "COMPLETED".into(),
+            result_event_id: Some("event-1".into()),
+        };
+        let wire = serde_json::to_vec(&receipt).unwrap();
+        let decoded: ToolExecutionReceipt = serde_json::from_slice(&wire).unwrap();
+        assert_eq!(decoded, receipt);
     }
 
     #[test]

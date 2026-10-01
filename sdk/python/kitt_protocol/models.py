@@ -23,6 +23,12 @@ MEMORY_REMEMBER_REQUEST = "memory.remember.request"
 MEMORY_REMEMBER_RESPONSE = "memory.remember.response"
 MEMORY_RECALL_REQUEST = "memory.recall.request"
 MEMORY_RECALL_RESPONSE = "memory.recall.response"
+MEMORY_SEARCH_REQUEST = "memory.search.request"
+MEMORY_SEARCH_RESPONSE = "memory.search.response"
+MEMORY_TIMELINE_REQUEST = "memory.timeline.request"
+MEMORY_TIMELINE_RESPONSE = "memory.timeline.response"
+MEMORY_GET_REQUEST = "memory.get.request"
+MEMORY_GET_RESPONSE = "memory.get.response"
 MEMORY_FORGET_REQUEST = "memory.forget.request"
 MEMORY_FORGET_RESPONSE = "memory.forget.response"
 MEMORY_MANAGE_REQUEST = "memory.manage.request"
@@ -221,6 +227,102 @@ class MemoryRecallRequest:
     as_of: int | None = None
     allow_private: bool = False
     allow_secret: bool = False
+
+
+@dataclass(frozen=True)
+class MemorySearchRequest:
+    namespace: str
+    workspace_id: str
+    query: str = ""
+    max_results: int = 24
+    token_budget: int = 1200
+    scope_key: str | None = None
+    as_of: int | None = None
+    allow_private: bool = False
+    allow_secret: bool = False
+
+
+@dataclass(frozen=True)
+class MemoryTimelineRequest:
+    namespace: str
+    workspace_id: str
+    source_id: str | None = None
+    scope_key: str | None = None
+    around: int | None = None
+    limit: int = 24
+    token_budget: int = 1200
+    allow_private: bool = False
+    allow_secret: bool = False
+
+
+@dataclass(frozen=True)
+class MemoryGetRequest:
+    namespace: str
+    workspace_id: str
+    ids: tuple[str, ...]
+    scope_key: str | None = None
+    token_budget: int = 2400
+    allow_private: bool = False
+    allow_secret: bool = False
+
+
+@dataclass(frozen=True)
+class MemorySearchHit:
+    id: str
+    kind: str
+    snippet: str
+    sensitivity: str
+    scope: str
+    scope_key: str | None
+    importance: float
+    confidence: float
+    token_estimate: int
+    provenance: tuple["ResourceRef", ...] = ()
+
+
+@dataclass(frozen=True)
+class MemorySearchResponse:
+    recall_trace_id: str
+    hits: tuple[MemorySearchHit, ...]
+    consumed_tokens: int
+    has_more: bool
+
+
+@dataclass(frozen=True)
+class MemoryTimelineHit:
+    id: str
+    kind: str
+    snippet: str
+    updated_at: int
+    sensitivity: str
+    scope: str
+    scope_key: str | None
+    importance: float
+    confidence: float
+    token_estimate: int
+    provenance: tuple["ResourceRef", ...] = ()
+
+
+@dataclass(frozen=True)
+class MemoryTimelineResponse:
+    recall_trace_id: str
+    hits: tuple[MemoryTimelineHit, ...]
+    consumed_tokens: int
+    has_more: bool
+
+
+@dataclass(frozen=True)
+class MemoryHydratedRecord:
+    record: dict[str, Any]
+    provenance: tuple["ResourceRef", ...] = ()
+
+
+@dataclass(frozen=True)
+class MemoryGetResponse:
+    recall_trace_id: str
+    records: tuple[MemoryHydratedRecord, ...]
+    consumed_tokens: int
+    truncated_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)

@@ -13,9 +13,23 @@
 
 K.I.T.T. Protocol defines the external contracts used between independently packaged K.I.T.T. components. Canonical JSON Schemas are paired with small SDKs so the Agent, Assistant, Memory, workers and native services can evolve without duplicating transport logic or coupling their implementations.
 
-Protocol **0.5.2** keeps Envelope protocol v1 and adds the shared `KittRequestMetadata` contract used for Agent ↔ Reverse Proxy correlation (`conversation_id`, `turn_id`, `request_id`, `route`, optional `session_id`). Context, tools and correlation remain structured data rather than prompt-derived semantics. The release also retains the 0.5.1 structural roles, permissions, plugin capabilities and Memory lifecycle contracts.
+Protocol **0.6.0** keeps Envelope protocol v1 and completes the shared contracts required by the agentic runtime. Memory now has progressive `search/timeline/get` messages with explicit token budgets; conversation runtime bindings, context-segment reconciliation and tool-execution receipts are shared value contracts rather than Agent-local DTOs. `KittRequestMetadata`, typed ContextEnvelope data, tools and correlation remain structural rather than prompt-derived.
 
 ---
+
+## Agentic 0.6 additions
+
+- `MemorySearchRequest` returns bounded snippets/candidates first; `MemoryGetRequest` hydrates selected records under its own budget; `MemoryTimelineRequest` provides source/session chronology without overloading semantic search.
+- `ToolExecutionReceipt` gives replay/reconnect a stable execution identity for side-effecting calls.
+- `ConversationRuntimeBinding` represents per-conversation LOCAL/DOCKER/PODMAN/KUBERNETES/REMOTE ownership without making a global environment variable authoritative.
+- `ContextSegmentReconciliation` records UNCHANGED/RECONCILED/REPLACED/INVALIDATED decisions between context epochs.
+
+## Agentic 0.6 additions
+
+- `MemorySearchRequest` returns bounded snippets/candidates first; `MemoryGetRequest` hydrates selected records under its own token budget; `MemoryTimelineRequest` provides source/session chronology without overloading semantic search.
+- `ToolExecutionReceipt` gives replay/reconnect a stable execution identity for side-effecting calls.
+- `ConversationRuntimeBinding` represents per-conversation LOCAL/DOCKER/PODMAN/KUBERNETES/REMOTE ownership without making a global environment variable authoritative.
+- `ContextSegmentReconciliation` records UNCHANGED/RECONCILED/REPLACED/INVALIDATED decisions between context epochs.
 
 ## What’s included
 

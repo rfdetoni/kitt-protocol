@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 - 2026-10-01
+
+- Add progressive Memory protocol messages: `memory.search`, `memory.timeline` and `memory.get`, with explicit token budgets instead of fixed-count recall as the primary sizing control.
+- Add shared conversation-runtime binding, context reconciliation, execution-resource and tool-execution receipt contracts for durable replay/idempotency.
+- Align Python agentic enums with the existing Rust/TypeScript event durability, runtime backend, isolation and evidence-origin contracts.
+- Keep transport Envelope protocol v1 and ContextEnvelope schema v1; this is a package/source-contract evolution.
+
+
 ## 0.5.2 - 2026-09-30
 
 - Add shared `KittRequestMetadata` across Rust, Python and TypeScript SDKs.
