@@ -393,6 +393,8 @@ pub struct MemoryTimelineRequest {
 pub struct MemoryGetRequest {
     pub namespace: String,
     pub workspace_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
     pub ids: Vec<String>,
     #[serde(default = "default_memory_get_budget")]
     pub token_budget: u64,
