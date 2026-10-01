@@ -258,6 +258,7 @@ class MemoryGetRequest:
     namespace: str
     workspace_id: str
     ids: tuple[str, ...]
+    scope_key: str | None = None
     token_budget: int = 2400
     allow_private: bool = False
     allow_secret: bool = False
