@@ -386,6 +386,10 @@ pub struct MemoryTimelineRequest {
     pub limit: usize,
     #[serde(default = "default_memory_search_budget")]
     pub token_budget: u64,
+    #[serde(default)]
+    pub allow_private: bool,
+    #[serde(default)]
+    pub allow_secret: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
