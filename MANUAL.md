@@ -126,3 +126,10 @@ PYTHONPATH=sdk/python python3 -m unittest discover sdk/python/tests
 # Validação TypeScript / Fixtures
 npm test
 ```
+
+
+## Contratos de memória 0.9
+
+O Envelope continua em versão 1. `memory.search.request` aceita opcionalmente `include_provenance`, `exclude_ids` e `include_context_hints`. `memory.timeline.request` e `memory.get.request` também permitem controlar provenance; em `memory.get`, o padrão permanece incluir provenance.
+
+`memory.baseline.request` recebe namespace/workspace, orçamento, filtros de sensibilidade e opcionalmente `if_none_match`. A resposta pode indicar `not_modified=true` com `etag` e `baseline_revision`, evitando retransmitir um baseline inalterado.

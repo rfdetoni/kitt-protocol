@@ -157,9 +157,11 @@ class ProtocolModelsTest(unittest.TestCase):
 
     def test_progressive_memory_contracts_are_budgeted(self):
         from kitt_protocol import (
+            MEMORY_BASELINE_REQUEST,
             MEMORY_GET_REQUEST,
             MEMORY_SEARCH_REQUEST,
             MEMORY_TIMELINE_REQUEST,
+            MemoryBaselineRequest,
             MemoryGetRequest,
             MemorySearchRequest,
             MemoryTimelineRequest,
@@ -171,6 +173,9 @@ class ProtocolModelsTest(unittest.TestCase):
             query="database rule",
             max_results=12,
             token_budget=256,
+            include_provenance=False,
+            exclude_ids=("mem-old",),
+            include_context_hints=True,
         )
         timeline = MemoryTimelineRequest(
             namespace="agent-cli",
@@ -184,13 +189,24 @@ class ProtocolModelsTest(unittest.TestCase):
             ids=("mem-1", "mem-2"),
             token_budget=512,
         )
+        baseline = MemoryBaselineRequest(
+            namespace="agent-cli",
+            workspace_id="ws",
+            max_tokens=800,
+            if_none_match="etag-1",
+        )
 
         self.assertEqual("memory.search.request", MEMORY_SEARCH_REQUEST)
         self.assertEqual("memory.timeline.request", MEMORY_TIMELINE_REQUEST)
         self.assertEqual("memory.get.request", MEMORY_GET_REQUEST)
+        self.assertEqual("memory.baseline.request", MEMORY_BASELINE_REQUEST)
         self.assertEqual(256, search.token_budget)
+        self.assertEqual(("mem-old",), search.exclude_ids)
+        self.assertTrue(search.include_context_hints)
         self.assertEqual("session-1", timeline.source_id)
         self.assertEqual(("mem-1", "mem-2"), get.ids)
+        self.assertTrue(get.include_provenance)
+        self.assertEqual("etag-1", baseline.if_none_match)
 
     def test_authenticated_frame_hides_token_in_repr(self):
         frame = AuthenticatedFrame(

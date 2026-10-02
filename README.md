@@ -13,9 +13,16 @@
 
 K.I.T.T. Protocol defines the external contracts used between independently packaged K.I.T.T. components. Canonical JSON Schemas are paired with small SDKs so the Agent, Assistant, Memory, workers and native services can evolve without duplicating transport logic or coupling their implementations.
 
-Protocol **0.7.0** keeps Envelope protocol v1 and completes the shared contracts required by the agentic runtime. Memory now has progressive `search/timeline/get` messages with explicit token budgets; conversation runtime bindings, context-segment reconciliation and tool-execution receipts are shared value contracts rather than Agent-local DTOs. `KittRequestMetadata`, typed ContextEnvelope data, tools and correlation remain structural rather than prompt-derived.
+Protocol **0.9.0** keeps Envelope protocol v1 and extends the shared memory contract without changing framing. Memory now has progressive `search/timeline/get` messages with explicit token budgets; conversation runtime bindings, context-segment reconciliation and tool-execution receipts are shared value contracts rather than Agent-local DTOs. `KittRequestMetadata`, typed ContextEnvelope data, tools and correlation remain structural rather than prompt-derived.
 
 ---
+
+## Memory 0.9 additions
+
+- `memory.baseline.request/response` carries deterministic baseline revisions and ETags, including `if_none_match` reuse.
+- Progressive search adds optional `include_provenance`, `exclude_ids` and `include_context_hints`; timeline/get add optional provenance control.
+- Search responses can optionally include `context_hints` and `common` metadata when explicitly requested.
+- Existing search/timeline/get fields remain unchanged and Envelope protocol stays at **v1**.
 
 ## Agentic 0.6 additions
 
@@ -74,7 +81,7 @@ Protocol **0.7.0** keeps Envelope protocol v1 and completes the shared contracts
 | System | `system.ping.request` | `system.ping.response`, `system.error` | health and protocol errors |
 | Assistant | `assistant.ask.request`, `assistant.ask_routed.request` | `assistant.ask.response`, `assistant.ask_routed.response` | normal and Fast/Heavy routed queries |
 | Transcription | `assistant.transcribe.request` | `assistant.transcribe.response` | audio transcription |
-| Memory | `memory.remember.request`, `memory.recall.request`, `memory.forget.request` | corresponding memory responses | shared structured memory |
+| Memory | `memory.remember.request`, `memory.search.request`, `memory.timeline.request`, `memory.get.request`, `memory.baseline.request`, `memory.recall.request`, `memory.forget.request` | corresponding memory responses | shared structured memory |
 | HUD | `hud.subscribe.request`, `hud.image.request` | responses and `hud.event` | ephemeral desktop overlay events |
 | Workers | `worker.execute.request` | `worker.execute.response` | on-demand worker execution |
 | Settings | catalog/snapshot/validate/apply/health requests | corresponding settings responses | Control Center lifecycle |
