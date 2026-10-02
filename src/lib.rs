@@ -39,6 +39,8 @@ pub mod kinds {
     pub const MEMORY_TIMELINE_RESPONSE: &str = "memory.timeline.response";
     pub const MEMORY_GET_REQUEST: &str = "memory.get.request";
     pub const MEMORY_GET_RESPONSE: &str = "memory.get.response";
+    pub const MEMORY_BASELINE_REQUEST: &str = "memory.baseline.request";
+    pub const MEMORY_BASELINE_RESPONSE: &str = "memory.baseline.response";
     pub const MEMORY_FORGET_REQUEST: &str = "memory.forget.request";
     pub const MEMORY_FORGET_RESPONSE: &str = "memory.forget.response";
     pub const MEMORY_MANAGE_REQUEST: &str = "memory.manage.request";
@@ -349,6 +351,9 @@ fn default_memory_search_budget() -> u64 {
 fn default_memory_get_budget() -> u64 {
     2400
 }
+fn default_memory_baseline_budget() -> usize {
+    800
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
@@ -369,6 +374,12 @@ pub struct MemorySearchRequest {
     pub allow_private: bool,
     #[serde(default)]
     pub allow_secret: bool,
+    #[serde(default)]
+    pub include_provenance: bool,
+    #[serde(default)]
+    pub exclude_ids: Vec<String>,
+    #[serde(default)]
+    pub include_context_hints: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -390,6 +401,8 @@ pub struct MemoryTimelineRequest {
     pub allow_private: bool,
     #[serde(default)]
     pub allow_secret: bool,
+    #[serde(default)]
+    pub include_provenance: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -406,6 +419,58 @@ pub struct MemoryGetRequest {
     pub allow_private: bool,
     #[serde(default)]
     pub allow_secret: bool,
+    #[serde(default = "default_true")]
+    pub include_provenance: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryBaselineRequest {
+    pub namespace: String,
+    pub workspace_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
+    #[serde(default = "default_memory_baseline_budget")]
+    pub max_tokens: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub as_of: Option<i64>,
+    #[serde(default)]
+    pub allow_private: bool,
+    #[serde(default)]
+    pub allow_secret: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub if_none_match: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryBaselineEntry {
+    pub memory_id: String,
+    pub section: String,
+    pub content: String,
+    pub pinned: bool,
+    pub score: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemoryBaselineResponse {
+    #[serde(default)]
+    pub not_modified: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub etag: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_revision: Option<u64>,
+    #[serde(default)]
+    pub entries: Vec<MemoryBaselineEntry>,
+    #[serde(default)]
+    pub estimated_tokens: u64,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_tokens: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub dropped_count: Option<u64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub budget_pressure: Option<f32>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -427,11 +492,35 @@ pub struct MemorySearchHit {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(deny_unknown_fields)]
+pub struct MemoryContextHint {
+    pub id: String,
+    pub path: String,
+    pub summary: String,
+    pub generation: u64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
+pub struct MemorySearchCommon {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sensitivity: Option<Sensitivity>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope: Option<MemoryScope>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scope_key: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(deny_unknown_fields)]
 pub struct MemorySearchResponse {
     pub recall_trace_id: String,
     pub hits: Vec<MemorySearchHit>,
     pub consumed_tokens: u64,
     pub has_more: bool,
+    #[serde(default)]
+    pub context_hints: Vec<MemoryContextHint>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub common: Option<MemorySearchCommon>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
