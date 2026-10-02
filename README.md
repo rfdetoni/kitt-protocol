@@ -282,3 +282,16 @@ No domain authority is duplicated in the SDKs: Rust, Python and TypeScript repre
 `HostExecutionState`, `PlanProposal`, `PlanTaskProposal`, `SubagentReport` and `VerificationStatus` are shared in all three SDKs. The schema is [schemas/agentic-planning.schema.json](schemas/agentic-planning.schema.json); the common wire fixture is [fixtures/agentic/planning.json](fixtures/agentic/planning.json). `KittRequestMetadata` supports `agent_role`, `parent_request_id` and `task_id`. Existing roles remain DISCOVER, ARCHITECT, IMPLEMENT, VERIFY and REVIEW.
 
 The executing host produces facts and assigns task IDs. A proposal, a child report, a stdout success marker or a metadata role does not grant permissions or prove completion. DAG admission, exact registered checks, budget leases, approval and evidence freshness belong to Agent CLI. Reverse Proxy transports the typed state and rejects cross-turn host facts.
+
+### Gateway execution grants (0.8.0)
+
+`KittRequestMetadata` optionally carries `max_upstream_attempts` (1–3),
+`deadline_ms` (1–900,000) and `max_prompt_tokens` (1–1,000,000). The prompt
+allowance is cumulative across the initial upstream generation and all repairs.
+The deadline covers queueing, generation and repairs. Agent remains the budget
+and execution authority; Proxy consumes this grant and reports actual attempts.
+
+Context envelopes have at most 256 segments. The standalone TypeScript export
+is generated from `schemas/context-envelope.schema.json`; check it with
+`python scripts/export_context_schema.py --check`. Downstream standalone
+consumers may vendor the export and verify it with `--output PATH --check`.

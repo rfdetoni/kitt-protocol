@@ -111,6 +111,9 @@ impl ContextEnvelope {
         if self.epoch.trim().is_empty() {
             return Err("context epoch is empty".into());
         }
+        if self.segments.len() > 256 {
+            return Err("context exceeds 256 segments".into());
+        }
         let mut ids = HashSet::new();
         for segment in &self.segments {
             if segment.id.trim().is_empty() {
@@ -154,10 +157,25 @@ pub struct KittRequestMetadata {
     pub parent_request_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub task_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_upstream_attempts: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deadline_ms: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_prompt_tokens: Option<u32>,
 }
 
 impl KittRequestMetadata {
     pub fn validate(&self) -> Result<(), String> {
+        for (name, value, limit) in [
+            ("max_upstream_attempts", self.max_upstream_attempts, 3),
+            ("deadline_ms", self.deadline_ms, 900_000),
+            ("max_prompt_tokens", self.max_prompt_tokens, 1_000_000),
+        ] {
+            if value.is_some_and(|value| value == 0 || value > limit) {
+                return Err(format!("invalid {name}"));
+            }
+        }
         for (name, value) in [
             ("conversation_id", self.conversation_id.as_str()),
             ("turn_id", self.turn_id.as_str()),
@@ -542,6 +560,10 @@ mod tests {
             agent_role: Some(AgentRole::Implement),
             parent_request_id: Some("parent-1".into()),
             task_id: Some("task-1".into()),
+
+            max_upstream_attempts: Some(3),
+            deadline_ms: Some(240000),
+            max_prompt_tokens: Some(8192),
         };
         metadata.validate().unwrap();
         let wire = serde_json::to_vec(&metadata).unwrap();

@@ -149,6 +149,8 @@ class ContextEnvelope:
             raise ValueError(f"unsupported agentic schema version {self.schema_version}")
         if not self.epoch.strip():
             raise ValueError("context epoch is empty")
+        if len(self.segments) > 256:
+            raise ValueError("context exceeds 256 segments")
         ids = [segment.id for segment in self.segments]
         if any(not value.strip() for value in ids):
             raise ValueError("context segment id is empty")
@@ -168,6 +170,9 @@ class KittRequestMetadata:
     agent_role: str | None = None
     parent_request_id: str | None = None
     task_id: str | None = None
+    max_upstream_attempts: int | None = None
+    deadline_ms: int | None = None
+    max_prompt_tokens: int | None = None
 
     def __post_init__(self) -> None:
         for name in ("conversation_id", "turn_id", "request_id", "route"):
@@ -179,6 +184,10 @@ class KittRequestMetadata:
             value = getattr(self, name)
             if value is not None and (not isinstance(value, str) or not value.strip() or len(value) > 256):
                 raise ValueError(f"{name} must be a non-empty string up to 256 characters")
+        for name, limit in (("max_upstream_attempts", 3), ("deadline_ms", 900000), ("max_prompt_tokens", 1000000)):
+            value = getattr(self, name)
+            if value is not None and (type(value) is not int or not 1 <= value <= limit):
+                raise ValueError(f"invalid {name}")
         if self.agent_role is not None:
             AgentRole(self.agent_role)
 

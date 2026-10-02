@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0 — 2026-10-02
+
+- Add optional bounded upstream attempt, end-to-end deadline and cumulative prompt grants in Rust, Python, TypeScript and JSON Schema.
+- Bound context envelopes to 256 segments and export the authoritative context schema for standalone consumers.
+- Preserve wire version 1 and compatibility for callers that omit the new metadata.
+
+
 ## 0.7.0 - 2026-10-01
 
 - Add shared host execution facts, bounded plan proposals, task roles and subagent reports across Rust, Python and TypeScript.

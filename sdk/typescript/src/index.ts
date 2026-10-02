@@ -425,6 +425,9 @@ export interface KittRequestMetadata {
   agent_role?: AgentRole | null;
   parent_request_id?: string | null;
   task_id?: string | null;
+  max_upstream_attempts?: number;
+  deadline_ms?: number;
+  max_prompt_tokens?: number;
 }
 
 export interface AgentEvent {
@@ -626,3 +629,5 @@ export interface SubagentReport {
   schema_version: 1; task_id: string; child_id: string; status: string;
   artifacts: string[]; evidence: string[]; blockers: string[];
 }
+
+export { CONTEXT_ENVELOPE_SCHEMA } from "./context-schema.js";

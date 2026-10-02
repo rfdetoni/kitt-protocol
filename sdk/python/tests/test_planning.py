@@ -20,3 +20,15 @@ class PlanningContracts(unittest.TestCase):
         for kwargs in ({'mutation_count':-1}, {'tool_call_count':True}, {'verified_mutation_count':1}, {'completion_ready':'yes'}):
             with self.assertRaises(ValueError):
                 HostExecutionState('c', 't', **kwargs)
+
+
+def test_gateway_grants_are_optional_and_have_hard_bounds():
+    import pytest
+    from kitt_protocol import KittRequestMetadata
+    identity = dict(conversation_id='c', turn_id='t', request_id='r', route='chat')
+    assert 'max_upstream_attempts' not in KittRequestMetadata(**identity).to_mapping()
+    metadata = KittRequestMetadata(**identity, max_upstream_attempts=3, deadline_ms=240000, max_prompt_tokens=8192)
+    assert metadata.to_mapping()['max_upstream_attempts'] == 3
+    for field, value in [('max_upstream_attempts', 4), ('deadline_ms', 0), ('max_prompt_tokens', True)]:
+        with pytest.raises(ValueError):
+            KittRequestMetadata(**identity, **{field: value})
