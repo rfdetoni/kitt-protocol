@@ -29,6 +29,8 @@ MEMORY_TIMELINE_REQUEST = "memory.timeline.request"
 MEMORY_TIMELINE_RESPONSE = "memory.timeline.response"
 MEMORY_GET_REQUEST = "memory.get.request"
 MEMORY_GET_RESPONSE = "memory.get.response"
+MEMORY_BASELINE_REQUEST = "memory.baseline.request"
+MEMORY_BASELINE_RESPONSE = "memory.baseline.response"
 MEMORY_FORGET_REQUEST = "memory.forget.request"
 MEMORY_FORGET_RESPONSE = "memory.forget.response"
 MEMORY_MANAGE_REQUEST = "memory.manage.request"
@@ -240,6 +242,9 @@ class MemorySearchRequest:
     as_of: int | None = None
     allow_private: bool = False
     allow_secret: bool = False
+    include_provenance: bool = False
+    exclude_ids: tuple[str, ...] = ()
+    include_context_hints: bool = False
 
 
 @dataclass(frozen=True)
@@ -253,6 +258,7 @@ class MemoryTimelineRequest:
     token_budget: int = 1200
     allow_private: bool = False
     allow_secret: bool = False
+    include_provenance: bool = False
 
 
 @dataclass(frozen=True)
@@ -264,6 +270,40 @@ class MemoryGetRequest:
     token_budget: int = 2400
     allow_private: bool = False
     allow_secret: bool = False
+    include_provenance: bool = True
+
+
+@dataclass(frozen=True)
+class MemoryBaselineRequest:
+    namespace: str
+    workspace_id: str
+    scope_key: str | None = None
+    max_tokens: int = 800
+    as_of: int | None = None
+    allow_private: bool = False
+    allow_secret: bool = False
+    if_none_match: str | None = None
+
+
+@dataclass(frozen=True)
+class MemoryBaselineEntry:
+    memory_id: str
+    section: str
+    content: str
+    pinned: bool
+    score: float
+
+
+@dataclass(frozen=True)
+class MemoryBaselineResponse:
+    not_modified: bool = False
+    etag: str | None = None
+    baseline_revision: int | None = None
+    entries: tuple[MemoryBaselineEntry, ...] = ()
+    estimated_tokens: int = 0
+    max_tokens: int | None = None
+    dropped_count: int | None = None
+    budget_pressure: float | None = None
 
 
 @dataclass(frozen=True)
@@ -281,11 +321,28 @@ class MemorySearchHit:
 
 
 @dataclass(frozen=True)
+class MemoryContextHint:
+    id: str
+    path: str
+    summary: str
+    generation: int
+
+
+@dataclass(frozen=True)
+class MemorySearchCommon:
+    sensitivity: str | None = None
+    scope: str | None = None
+    scope_key: str | None = None
+
+
+@dataclass(frozen=True)
 class MemorySearchResponse:
     recall_trace_id: str
     hits: tuple[MemorySearchHit, ...]
     consumed_tokens: int
     has_more: bool
+    context_hints: tuple[MemoryContextHint, ...] = ()
+    common: MemorySearchCommon | None = None
 
 
 @dataclass(frozen=True)
