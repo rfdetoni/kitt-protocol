@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.0 — 2026-10-02
+
+- Keep Envelope protocol v1 while adding `memory.baseline.request/response` with deterministic revision/ETag reuse.
+- Add optional progressive retrieval controls for provenance, session exclusions and context hints across Rust, Python and TypeScript.
+- Add optional search response context-hint/common metadata while preserving existing v1 hit fields.
+- Bump Rust/Python/TypeScript package metadata together to 0.9.0 and extend SDK contract tests.
+
 ## 0.8.0 — 2026-10-02
 
 - Add optional bounded upstream attempt, end-to-end deadline and cumulative prompt grants in Rust, Python, TypeScript and JSON Schema.
