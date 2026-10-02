@@ -23,6 +23,8 @@ export const KINDS = {
   MEMORY_TIMELINE_RESPONSE: "memory.timeline.response",
   MEMORY_GET_REQUEST: "memory.get.request",
   MEMORY_GET_RESPONSE: "memory.get.response",
+  MEMORY_BASELINE_REQUEST: "memory.baseline.request",
+  MEMORY_BASELINE_RESPONSE: "memory.baseline.response",
   MEMORY_FORGET_REQUEST: "memory.forget.request",
   MEMORY_FORGET_RESPONSE: "memory.forget.response",
   MEMORY_MANAGE_REQUEST: "memory.manage.request",
@@ -129,6 +131,9 @@ export interface MemorySearchRequest {
   as_of?: number | null;
   allow_private?: boolean;
   allow_secret?: boolean;
+  include_provenance?: boolean;
+  exclude_ids?: string[];
+  include_context_hints?: boolean;
 }
 
 export interface MemoryTimelineRequest {
@@ -141,6 +146,7 @@ export interface MemoryTimelineRequest {
   token_budget?: number;
   allow_private?: boolean;
   allow_secret?: boolean;
+  include_provenance?: boolean;
 }
 
 export interface MemoryGetRequest {
@@ -151,6 +157,37 @@ export interface MemoryGetRequest {
   token_budget?: number;
   allow_private?: boolean;
   allow_secret?: boolean;
+  include_provenance?: boolean;
+}
+
+export interface MemoryBaselineRequest {
+  namespace: string;
+  workspace_id: string;
+  scope_key?: string | null;
+  max_tokens?: number;
+  as_of?: number | null;
+  allow_private?: boolean;
+  allow_secret?: boolean;
+  if_none_match?: string | null;
+}
+
+export interface MemoryBaselineEntry {
+  memory_id: string;
+  section: string;
+  content: string;
+  pinned: boolean;
+  score: number;
+}
+
+export interface MemoryBaselineResponse {
+  not_modified?: boolean;
+  etag?: string | null;
+  baseline_revision?: number | null;
+  entries?: MemoryBaselineEntry[];
+  estimated_tokens?: number;
+  max_tokens?: number | null;
+  dropped_count?: number | null;
+  budget_pressure?: number | null;
 }
 
 export interface MemorySearchHit {
@@ -166,11 +203,26 @@ export interface MemorySearchHit {
   provenance?: ResourceRef[];
 }
 
+export interface MemoryContextHint {
+  id: string;
+  path: string;
+  summary: string;
+  generation: number;
+}
+
+export interface MemorySearchCommon {
+  sensitivity?: Sensitivity | null;
+  scope?: MemoryScope | null;
+  scope_key?: string | null;
+}
+
 export interface MemorySearchResponse {
   recall_trace_id: string;
   hits: MemorySearchHit[];
   consumed_tokens: number;
   has_more: boolean;
+  context_hints?: MemoryContextHint[];
+  common?: MemorySearchCommon | null;
 }
 
 export interface MemoryTimelineHit {
