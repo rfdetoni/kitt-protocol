@@ -690,7 +690,6 @@ mod tests {
         assert_eq!(response.correlation_id.as_deref(), Some("req-ask-001"));
     }
 
-
     #[test]
     fn generated_envelopes_round_trip_across_payload_shapes() {
         for index in 0..256_u32 {
