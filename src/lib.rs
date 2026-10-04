@@ -734,8 +734,8 @@ mod tests {
         let oversized = vec![b' '; MAX_FRAME_BYTES + 1];
         assert_eq!(Envelope::decode(&oversized).unwrap_err(), "frame_too_large");
         assert_eq!(
-            AuthenticatedFrame::decode(&oversized).unwrap_err(),
-            "frame_too_large"
+            AuthenticatedFrame::decode(&oversized).err().as_deref(),
+            Some("frame_too_large")
         );
     }
 }
