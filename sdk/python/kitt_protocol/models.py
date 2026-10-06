@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 import json
 import uuid
+import math
 
 PROTOCOL_VERSION = 1
 MAX_FRAME_BYTES = 1024 * 1024
@@ -77,6 +78,45 @@ def _ensure_object(value: Any, name: str) -> dict[str, Any]:
     return value
 
 
+def _load_json(raw: str | bytes) -> Any:
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ProtocolError("duplicate JSON field")
+            result[key] = value
+        return result
+
+    def reject_constant(value):
+        raise ProtocolError(f"non-finite JSON number: {value}")
+
+    def finite_float(value):
+        number = float(value)
+        if not math.isfinite(number):
+            raise ProtocolError("non-finite JSON number")
+        return number
+
+    try:
+        encoded = raw.encode("utf-8", "strict") if isinstance(raw, str) else raw
+        if len(encoded) > MAX_FRAME_BYTES:
+            raise ProtocolError("frame_too_large")
+        data = json.loads(encoded.decode("utf-8", "strict"), object_pairs_hook=pairs, parse_constant=reject_constant, parse_float=finite_float)
+        pending = [(data, 0)]
+        while pending:
+            value, depth = pending.pop()
+            if depth > 128:
+                raise ProtocolError("JSON nesting limit exceeded")
+            if isinstance(value, str):
+                value.encode("utf-8", "strict")
+            elif isinstance(value, dict):
+                pending.extend((item, depth + 1) for pair in value.items() for item in pair)
+            elif isinstance(value, list):
+                pending.extend((item, depth + 1) for item in value)
+        return data
+    except (ValueError, UnicodeError, RecursionError) as exc:
+        raise ProtocolError(f"invalid_json: {exc}") from exc
+
+
 @dataclass(frozen=True)
 class Envelope:
     kind: str
@@ -86,7 +126,7 @@ class Envelope:
     version: int = PROTOCOL_VERSION
 
     def __post_init__(self) -> None:
-        if self.version != PROTOCOL_VERSION:
+        if type(self.version) is not int or self.version != PROTOCOL_VERSION:
             raise ProtocolError(
                 f"unsupported protocol version {self.version}; expected {PROTOCOL_VERSION}"
             )
@@ -133,18 +173,13 @@ class Envelope:
         return json.dumps(
             self.to_mapping(),
             ensure_ascii=False,
+            allow_nan=False,
             separators=(",", ":"),
         )
 
     @classmethod
     def loads(cls, raw: str | bytes) -> "Envelope":
-        encoded = raw.encode("utf-8") if isinstance(raw, str) else raw
-        if len(encoded) > MAX_FRAME_BYTES:
-            raise ProtocolError("frame_too_large")
-        try:
-            data = json.loads(encoded)
-        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            raise ProtocolError(f"invalid_json: {exc}") from exc
+        data = _load_json(raw)
         return cls.from_mapping(data)
 
     @classmethod
@@ -173,18 +208,13 @@ class AuthenticatedFrame:
         return json.dumps(
             {"token": self.token, "envelope": self.envelope.to_mapping()},
             ensure_ascii=False,
+            allow_nan=False,
             separators=(",", ":"),
         )
 
     @classmethod
     def loads(cls, raw: str | bytes) -> "AuthenticatedFrame":
-        encoded = raw.encode("utf-8") if isinstance(raw, str) else raw
-        if len(encoded) > MAX_FRAME_BYTES:
-            raise ProtocolError("frame_too_large")
-        try:
-            data = _ensure_object(json.loads(encoded), "authenticated frame")
-        except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            raise ProtocolError(f"invalid_json: {exc}") from exc
+        data = _ensure_object(_load_json(raw), "authenticated frame")
         if set(data) != {"token", "envelope"}:
             raise ProtocolError("authenticated frame must contain exactly token and envelope")
         return cls(

@@ -1,3 +1,5 @@
+import assert from "node:assert/strict";
+import { decodeEnvelope, decodeAuthenticatedFrame } from "../.test-sdk/index.js";
 import { readFileSync } from "node:fs";
 
 const fixtures = [
@@ -42,3 +44,11 @@ if (planning.metadata.agent_role !== 'VERIFY' || planning.host_execution.schema_
   throw new Error('invalid shared planning fixture');
 }
 console.log('validated shared planning wire fixture');
+
+for (const raw of JSON.parse(readFileSync('fixtures/decoding-invalid.json', 'utf8'))) {
+  assert.throws(() => decodeEnvelope(raw));
+  assert.throws(() => decodeAuthenticatedFrame('{"token":"test","envelope":' + raw + '}'));
+}
+assert.throws(() => decodeEnvelope(new Uint8Array([255])));
+assert.equal(decodeEnvelope('{"version":1,"id":"x","kind":"test","payload":null}').payload, null);
+console.log('validated shared adversarial wire corpus through public TypeScript decoders');
