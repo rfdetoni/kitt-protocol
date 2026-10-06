@@ -1,11 +1,11 @@
 {
   "name": "@kitt/protocol",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "private": true,
   "type": "module",
   "scripts": {
     "typecheck": "tsc -p sdk/typescript/tsconfig.json --noEmit",
-    "test": "tsc -p sdk/typescript/tsconfig.json --noEmit && node scripts/validate-fixtures.mjs"
+    "test": "tsc -p sdk/typescript/tsconfig.json --noEmit false --outDir .test-sdk && node scripts/validate-fixtures.mjs"
   },
   "devDependencies": {
     "typescript": "^5.7.0"

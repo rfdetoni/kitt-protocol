@@ -48,3 +48,19 @@ fn deterministic_adversarial_bytes_never_escape_decoder_contract() {
         Some("frame_too_large")
     );
 }
+
+#[test]
+fn shared_invalid_wire_corpus_is_rejected() {
+    let cases: Vec<String> =
+        serde_json::from_str(include_str!("../fixtures/decoding-invalid.json")).unwrap();
+    for raw in cases {
+        assert!(Envelope::decode(raw.as_bytes()).is_err(), "accepted {raw}");
+        let framed = format!("{{\"token\":\"test\",\"envelope\":{raw}}}");
+        assert!(
+            AuthenticatedFrame::decode(framed.as_bytes()).is_err(),
+            "accepted {raw}"
+        );
+    }
+    assert!(Envelope::decode(&[255]).is_err());
+    assert!(Envelope::decode(br#"{"version":1,"id":"x","kind":"test","payload":null}"#).is_ok());
+}

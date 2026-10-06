@@ -1,4 +1,7 @@
 export const PROTOCOL_VERSION = 1 as const;
+import { strictJson } from './strict-json.js';
+export function decodeEnvelope(raw: string | Uint8Array): Envelope { return parseEnvelope(strictJson(raw)); }
+export function decodeAuthenticatedFrame(raw: string | Uint8Array): AuthenticatedFrame { return parseAuthenticatedFrame(strictJson(raw)); }
 export const MAX_FRAME_BYTES = 1024 * 1024;
 
 export const KINDS = {

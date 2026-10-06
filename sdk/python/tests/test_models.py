@@ -17,6 +17,20 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 class ProtocolModelsTest(unittest.TestCase):
+    def test_shared_invalid_wire_corpus(self):
+        for raw in json.loads((ROOT / "fixtures/decoding-invalid.json").read_text()):
+            with self.subTest(raw=raw), self.assertRaises(ProtocolError):
+                Envelope.loads(raw)
+            with self.subTest(raw=raw), self.assertRaises(ProtocolError):
+                AuthenticatedFrame.loads('{"token":"test","envelope":' + raw + '}')
+        valid = '{"version":1,"id":"x","kind":"system.ping.request","payload":null}'
+        with self.assertRaises(ProtocolError):
+            Envelope.loads(valid.encode("utf-16"))
+        with self.assertRaises(ProtocolError):
+            Envelope.loads(b"\xff")
+        with self.assertRaises(ValueError):
+            Envelope(kind="test", payload=float("nan")).dumps()
+
     def test_fixture_request_and_response(self):
         request = AuthenticatedFrame.loads(
             (ROOT / "fixtures/v1/assistant-ask-request.json").read_bytes()

@@ -1,5 +1,11 @@
 # K.I.T.T. Protocol
 
+## Release 0.9.1 — execution boundary hardening
+
+Reject duplicate JSON keys, non-finite numbers and invalid UTF-8 at the public wire decoders. Python requires an integer version; Rust requires the payload field (explicit null remains valid). Add shared adversarial wire fixtures and exercise the public TypeScript decoders. Wire version remains 1.
+
+See [release notes](docs/RELEASE_0.9.1.md).
+
 <p align="center">
   <strong>Versioned, language-neutral contracts for the K.I.T.T. ecosystem.</strong><br>
   JSON Schema · Rust · Python · TypeScript · bounded framing · transport-agnostic IPC

@@ -1,0 +1,11 @@
+[
+  "{\"version\":true,\"id\":\"x\",\"kind\":\"system.ping.request\",\"payload\":null}",
+  "{\"version\":1,\"id\":\"x\",\"kind\":\"system.ping.request\"}",
+  "{\"version\":1,\"id\":\"x\",\"id\":\"y\",\"kind\":\"system.ping.request\",\"payload\":null}",
+  "{\"version\":1,\"id\":\"x\",\"kind\":\"system.ping.request\",\"payload\":{\"path\":\"a\",\"path\":\"b\"}}",
+  "{\"version\":1,\"id\":\"x\",\"kind\":\"system.ping.request\",\"payload\":NaN}",
+  "{\"version\":1,\"id\":\"x\",\"kind\":\"system.ping.request\",\"payload\":1e999}",
+  "{\"version\":1.0,\"id\":\"x\",\"kind\":\"test\",\"payload\":null}",
+  "{\"version\":1e0,\"id\":\"x\",\"kind\":\"test\",\"payload\":null}",
+  "{\"version\":1,\"id\":\"x\",\"kind\":\"test\",\"payload\":\"\\ud800\"}"
+]

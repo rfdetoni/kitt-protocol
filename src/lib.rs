@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
+mod strict_json;
 
 mod agentic;
 pub use agentic::*;
@@ -85,8 +86,12 @@ pub struct Envelope {
     pub kind: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub correlation_id: Option<String>,
-    #[serde(default)]
+    #[serde(deserialize_with = "required_payload")]
     pub payload: Value,
+}
+
+fn required_payload<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<Value, D::Error> {
+    Value::deserialize(deserializer)
 }
 
 impl Envelope {
@@ -155,7 +160,9 @@ impl Envelope {
         if data.len() > MAX_FRAME_BYTES {
             return Err("frame_too_large".into());
         }
-        let envelope: Self = serde_json::from_slice(data).map_err(|e| e.to_string())?;
+        let value: strict_json::StrictValue =
+            serde_json::from_slice(data).map_err(|e| e.to_string())?;
+        let envelope: Self = serde_json::from_value(value.0).map_err(|e| e.to_string())?;
         envelope.validate()?;
         Ok(envelope)
     }
@@ -182,7 +189,9 @@ impl AuthenticatedFrame {
         if data.len() > MAX_FRAME_BYTES {
             return Err("frame_too_large".into());
         }
-        let frame: Self = serde_json::from_slice(data).map_err(|e| e.to_string())?;
+        let value: strict_json::StrictValue =
+            serde_json::from_slice(data).map_err(|e| e.to_string())?;
+        let frame: Self = serde_json::from_value(value.0).map_err(|e| e.to_string())?;
         if frame.token.trim().is_empty() {
             return Err("authentication token is empty".into());
         }
