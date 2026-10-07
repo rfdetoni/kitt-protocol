@@ -1,5 +1,11 @@
 # K.I.T.T. Protocol
 
+## Release 0.9.2 — Provider argument limit contract
+
+Python and TypeScript SDKs export MAX_TOOL_ARGUMENT_BYTES (65,536 bytes). The limit includes the serialized JSON and UTF-8 escaping. Producers reject larger tool arguments before dispatch, and consumers enforce the same boundary. Envelope protocol versions and memory schemas are unchanged.
+
+See [release notes](docs/RELEASE_0.9.2.md).
+
 ## Release 0.9.1 — execution boundary hardening
 
 Reject duplicate JSON keys, non-finite numbers and invalid UTF-8 at the public wire decoders. Python requires an integer version; Rust requires the payload field (explicit null remains valid). Add shared adversarial wire fixtures and exercise the public TypeScript decoders. Wire version remains 1.

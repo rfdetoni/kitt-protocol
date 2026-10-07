@@ -1,4 +1,5 @@
 export const PROTOCOL_VERSION = 1 as const;
+export { MAX_TOOL_ARGUMENT_BYTES } from './provider-limits.js';
 import { strictJson } from './strict-json.js';
 export function decodeEnvelope(raw: string | Uint8Array): Envelope { return parseEnvelope(strictJson(raw)); }
 export function decodeAuthenticatedFrame(raw: string | Uint8Array): AuthenticatedFrame { return parseAuthenticatedFrame(strictJson(raw)); }

@@ -148,7 +148,30 @@ def agentic_planning_fields() -> None:
         )
 
 
+def provider_argument_limit_parity() -> None:
+    module = ast.parse(read("sdk/python/kitt_protocol/provider_limits.py"))
+    assignment = next(node for node in module.body if isinstance(node, ast.Assign))
+    def integer(expr):
+        if isinstance(expr, ast.Constant) and type(expr.value) is int:
+            return expr.value
+        if isinstance(expr, ast.BinOp) and isinstance(expr.op, ast.Mult):
+            return integer(expr.left) * integer(expr.right)
+        fail("provider argument limit is not a bounded integer expression")
+    values = {"python": integer(assignment.value)}
+    for label, path, pattern in (
+        ("typescript", "sdk/typescript/src/provider-limits.ts", r"MAX_TOOL_ARGUMENT_BYTES = ([0-9 *]+);"),
+        ("rust", "src/lib.rs", r"MAX_TOOL_ARGUMENT_BYTES: usize = ([0-9 *]+);"),
+    ):
+        match = re.search(pattern, read(path))
+        if not match:
+            fail(f"{label} provider argument limit missing")
+        values[label] = integer(ast.parse(match.group(1), mode="eval").body)
+    if len(set(values.values())) != 1:
+        fail(f"provider argument limit drift: {values}")
+
+
 def main() -> int:
+    provider_argument_limit_parity()
     required_memory_remember_fields()
     agentic_planning_fields()
     compare(

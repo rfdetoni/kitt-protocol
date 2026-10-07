@@ -1,3 +1,4 @@
+pub const MAX_TOOL_ARGUMENT_BYTES: usize = 64 * 1024;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use uuid::Uuid;
