@@ -1,4 +1,5 @@
 export const PROTOCOL_VERSION = 1 as const;
+export { AGENT_CONTRACT_HEADER, AGENT_CONTRACT_VERSION, AGENT_ROUTE_HEADER, AGENT_RESPONSE_SCHEMA } from './agent-contract.js';
 export { MAX_TOOL_ARGUMENT_BYTES } from './provider-limits.js';
 import { strictJson } from './strict-json.js';
 export function decodeEnvelope(raw: string | Uint8Array): Envelope { return parseEnvelope(strictJson(raw)); }

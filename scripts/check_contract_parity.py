@@ -170,7 +170,24 @@ def provider_argument_limit_parity() -> None:
         fail(f"provider argument limit drift: {values}")
 
 
+def agent_response_parity() -> None:
+    names = ("AGENT_CONTRACT_HEADER", "AGENT_CONTRACT_VERSION", "AGENT_ROUTE_HEADER")
+    for name in names:
+        values = []
+        for label, path, pattern in (
+            ("python", "sdk/python/kitt_protocol/agent_contract.py", rf'^{name} = "([^\"]+)"'),
+            ("typescript", "sdk/typescript/src/agent-contract.ts", rf'export const {name} = "([^\"]+)"'),
+            ("rust", "src/lib.rs", rf'pub const {name}: &str = "([^\"]+)"'),
+        ):
+            match = re.search(pattern, read(path), re.M)
+            if not match:
+                fail(f"{label} Agent identifier missing: {name}")
+            values.append((label, {match.group(1)}))
+        compare(name, *values)
+
+
 def main() -> int:
+    agent_response_parity()
     provider_argument_limit_parity()
     required_memory_remember_fields()
     agentic_planning_fields()

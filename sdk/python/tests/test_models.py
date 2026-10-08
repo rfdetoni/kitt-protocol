@@ -11,12 +11,19 @@ from kitt_protocol import (
     MemoryRememberRequest,
     ProtocolError,
     SYSTEM_PING_REQUEST,
+    decode_json_object,
 )
 
 ROOT = Path(__file__).resolve().parents[3]
 
 
 class ProtocolModelsTest(unittest.TestCase):
+    def test_structured_result_rejects_duplicate_verdicts_and_extra_decisions(self):
+        self.assertEqual(decode_json_object('{"verdict":"OK","issues":[]}'), {"verdict":"OK","issues":[]})
+        for raw in ('{"verdict":"FAIL","verdict":"OK"}', '{"verdict":"OK"} {"verdict":"FAIL"}', '["OK"]', '{"value":NaN}'):
+            with self.subTest(raw=raw), self.assertRaises(ProtocolError):
+                decode_json_object(raw)
+
     def test_shared_invalid_wire_corpus(self):
         for raw in json.loads((ROOT / "fixtures/decoding-invalid.json").read_text()):
             with self.subTest(raw=raw), self.assertRaises(ProtocolError):

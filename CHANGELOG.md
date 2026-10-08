@@ -1,3 +1,9 @@
+## 0.10.0
+
+- Own Agent contract v3 identifiers and response schema; object-valued content avoids model-side double serialization.
+- Export a strict Python JSON-object decoder using the existing bounded wire decoder.
+- Check SDK identifier parity and generated schema provenance in CI.
+
 # Changelog
 
 ## 0.9.2 — 2026-10-07
