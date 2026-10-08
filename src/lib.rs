@@ -1,5 +1,5 @@
 pub const AGENT_CONTRACT_HEADER: &str = "X-Kitt-Agent-Contract";
-pub const AGENT_CONTRACT_VERSION: &str = "v3";
+pub const AGENT_CONTRACT_VERSION: &str = "v4";
 pub const AGENT_ROUTE_HEADER: &str = "X-Kitt-Route";
 pub const MAX_TOOL_ARGUMENT_BYTES: usize = 64 * 1024;
 use serde::{Deserialize, Serialize};

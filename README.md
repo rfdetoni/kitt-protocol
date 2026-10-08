@@ -1,3 +1,7 @@
+## Release 0.11.0 — KAP/1 textual WebChat actions
+
+The Agent v4 contract uses [KAP/1](docs/KAP.md) instead of model-authored JSON envelopes. The host retains typed and OpenAI-compatible JSON transport.
+
 ## Release 0.10.0 — Agent contract v3
 
 Agent responses may carry structured result objects directly in content. The authoritative response schema and wire identifiers are exported to the SDKs; strict object decoding rejects duplicate fields and extra decisions. Upgrade Agent CLI and Reverse Proxy together. See [release notes](docs/RELEASE_0.10.0.md).
