@@ -1,5 +1,10 @@
 ## 0.11.0
 
+- Add KAP/1 bounded model-facing wire format and shared TS parser.
+- Increment Agent contract negotiation to v4 without changing host-owned runtime authorization.
+
+## 0.11.0
+
 - Introduce KAP/1 bounded textual actions for the WebChat boundary; tool permissions and JSON transport remain host-owned.
 - Move Agent proxy contract negotiation to v4 without changing the validated in-process response schema.
 
