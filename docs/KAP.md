@@ -25,7 +25,7 @@ KITT/ENDTEXT
 KITT/END
 ```
 
-**Grammar:** One ACTION (TOOL, FINAL, WORKSPACE, TOOLS). TOOL requires a declared tool name. Typed path operations: STRING path = value; INTEGER path = signed integer; BOOLEAN path = true/false; NULL path; ARRAY path; OBJECT path; TEXT path followed by exact multiline content until a standalone KITT/ENDTEXT. Paths are dot-separated keys and decimal array indices, no escaping. Use ARRAY for empty arrays and OBJECT for empty objects, and then assign children with indexed or dotted paths. TOOL fields describe its tool_input object; non-tool fields must be rooted under content. Optional SUMMARY line is a short public progress description, never private reasoning. A reply ends only at KITT/END.
+**Grammar:** One ACTION (TOOL, FINAL, WORKSPACE, TOOLS). TOOL requires a declared tool name. Typed path operations: STRING path = value; INTEGER path = signed integer; BOOLEAN path = true/false; DECIMAL path = finite decimal; NULL path; ARRAY path; OBJECT path; TEXT path followed by exact multiline content until a standalone KITT/ENDTEXT. Paths are dot-separated keys and decimal array indices, no escaping. Use ARRAY for empty arrays and OBJECT for empty objects, and then assign children with indexed or dotted paths. TOOL fields describe its tool_input object; non-tool fields must be rooted under content. Optional SUMMARY line is a short public progress description, never private reasoning. A reply ends only at KITT/END.
 
 For example, structured final data uses OBJECT content and STRING content.verdict = OK. Planning arrays use ARRAY content.items, OBJECT content.items.0, STRING content.items.0.local_id = T01, and so on. Code/edit payloads use TEXT arguments.content to avoid serializing newlines, quotes and backslashes.
 
