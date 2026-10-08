@@ -3,7 +3,7 @@ from typing import Any
 from .models import ProtocolError, _load_json
 
 AGENT_CONTRACT_HEADER = "X-Kitt-Agent-Contract"
-AGENT_CONTRACT_VERSION = "v3"
+AGENT_CONTRACT_VERSION = "v4"
 AGENT_ROUTE_HEADER = "X-Kitt-Route"
 
 
