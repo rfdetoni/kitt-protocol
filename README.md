@@ -1,3 +1,7 @@
+## KAP/2 0.13.0 — strict text contract
+
+The Python and TypeScript SDKs implement the [KAP/2 grammar](docs/KAP2.md), golden corpus, differential fuzz and typed diagnostics. See [the RFC](docs/KAP2-roadmap.md) for host-dependent features not enabled in this release.
+
 ## Release 0.12.1 — KAP/2 compact agent output
 
 The model-facing [KAP/2 contract](docs/KAP2.md) reduces repetitive fields through indented objects, typed scalar values, tabular arrays and literal source blocks. Host transport, authorization and validation are unchanged.
