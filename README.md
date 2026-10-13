@@ -1,3 +1,7 @@
+## Protocol 0.13.1 — cross-consumer type compatibility
+
+KAP/2 diagnostics work with strict TypeScript optional-property type checking. This patch does not change the model-facing grammar.
+
 ## KAP/2 0.13.0 — strict text contract
 
 The Python and TypeScript SDKs implement the [KAP/2 grammar](docs/KAP2.md), golden corpus, differential fuzz and typed diagnostics. See [the RFC](docs/KAP2-roadmap.md) for host-dependent features not enabled in this release.
