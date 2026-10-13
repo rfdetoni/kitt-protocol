@@ -1,0 +1,9 @@
+{
+  "X-Foo": "bar",
+  "items": [
+    {
+      "a-b": "value,quoted",
+      "c": true
+    }
+  ]
+}
