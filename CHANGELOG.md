@@ -1,3 +1,8 @@
+## 0.12.0
+
+- Introduce compact KAP/2 grammar with bounded Python and TypeScript decoders, literal payloads and tabular records.
+- Keep the trusted host responsible for tool resolution, validation and authorization. Legacy KAP/1 input remains decodable during migration.
+
 ## 0.11.0
 
 - Add KAP/1 bounded model-facing wire format and shared TS parser.
