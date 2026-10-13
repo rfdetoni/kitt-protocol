@@ -1,3 +1,14 @@
+## 0.13.0
+
+- KAP/2 additive features: JSON-quoted keys, explicit empty values, object list items, UTF-8 length-prefixed literals, optional schema-informed primitives, typed error codes/lines, summary metadata and canonical encoders in both SDKs.
+- Add shared golden fixtures, seeded Python/TypeScript differential fuzz and size/depth/line-limit tests.
+- Document existing v3 JSON Schema identifier alongside Agent contract v4; no unverified schema renaming.
+
+## 0.12.2 (hardening phase, included in 0.13.0)
+
+- **Behavior changes:** reject row tabs, unpaired surrogates, controls, BOM, trailing spaces, negative zero, stray CR and W/Q bodies. These previously accepted forms are invalid.
+- Keep literal content verbatim; reject ambiguities rather than repairing output.
+
 ## 0.12.1
 
 - Reject competing KAP/2 control frames in non-literal final text.
