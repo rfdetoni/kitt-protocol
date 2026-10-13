@@ -34,3 +34,5 @@ jobs:
         with: { node-version: '22', cache: 'npm' }
       - run: npm ci
       - run: npm test
+      - name: KAP/2 Python ↔ TS differential fuzz (5000 seeded cases)
+        run: python scripts/fuzz_kap2_diff.py
