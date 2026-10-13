@@ -1,0 +1,5 @@
+K2 F
+"X-Foo": bar
+items[1]{"a-b",c}:
+  "value,quoted",true
+K2/END
