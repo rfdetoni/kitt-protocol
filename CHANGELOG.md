@@ -1,3 +1,8 @@
+## 0.13.1
+
+- Fix shared KAP2Error construction under TypeScript exactOptionalPropertyTypes, preserving optional metadata without assigning undefined.
+- Verify authoritative TypeScript diagnostic class parity with the reverse-proxy consumer.
+
 ## 0.13.0
 
 - KAP/2 additive features: JSON-quoted keys, explicit empty values, object list items, UTF-8 length-prefixed literals, optional schema-informed primitives, typed error codes/lines, summary metadata and canonical encoders in both SDKs.
