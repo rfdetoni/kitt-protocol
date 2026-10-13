@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc -p sdk/typescript/tsconfig.json --noEmit",
-    "test": "tsc -p sdk/typescript/tsconfig.json --noEmit false --outDir .test-sdk && node scripts/validate-fixtures.mjs"
+    "test": "tsc -p sdk/typescript/tsconfig.json --noEmit false --outDir .test-sdk && node scripts/validate-fixtures.mjs && node scripts/validate-kap2.mjs"
   },
   "devDependencies": {
     "typescript": "^5.7.0"
