@@ -1,3 +1,8 @@
+## 0.12.1
+
+- Reject competing KAP/2 control frames in non-literal final text.
+- Keep explicit literal blocks capable of carrying control-like text as inert data.
+
 ## 0.12.0
 
 - Introduce compact KAP/2 grammar with bounded Python and TypeScript decoders, literal payloads and tabular records.
