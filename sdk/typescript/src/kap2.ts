@@ -10,13 +10,31 @@ const MAX_LINES = 3000;
 const MAX_DEPTH = 20;
 const MAX_ROWS = 1024;
 
+
+function safeScalar(value: string): void {
+  for (let i = 0; i < value.length; i++) {
+    const cp = value.charCodeAt(i);
+    if (cp >= 0xd800 && cp <= 0xdbff) {
+      if (i + 1 >= value.length || value.charCodeAt(++i) < 0xdc00 || value.charCodeAt(i) > 0xdfff) throw new Error('Invalid KAP/2 Unicode/control scalar');
+    } else if (cp >= 0xdc00 && cp <= 0xdfff || cp < 32 || cp === 127) throw new Error('Invalid KAP/2 Unicode/control scalar');
+  }
+}
+function checkStructure(line: string): void {
+  if (line.includes('\t')) throw new Error('KAP/2 tabs are forbidden');
+  if (line.endsWith(' ')) throw new Error('KAP/2 trailing whitespace');
+  safeScalar(line);
+}
+
 function atom(input: string): unknown {
   if (input.startsWith('"')) {
     let value: unknown;
     try { value = JSON.parse(input); } catch { throw new Error('Invalid quoted scalar'); }
     if (typeof value !== 'string') throw new Error('Quoted scalar must be a string');
+    safeScalar(value);
     return value;
   }
+  safeScalar(input);
+  if (input === '-0' || (/^-0\.0+$/.test(input))) throw new Error('Noncanonical negative zero');
   if (input === 'true') return true;
   if (input === 'false') return false;
   if (input === 'null') return null;
@@ -49,12 +67,14 @@ function csv(line: string): string[] {
         } else { quoted += line[index++]; }
       }
       if (!closed || (index < line.length && line[index] !== ',')) throw new Error('Invalid quoted table cell');
+      safeScalar(quoted);
       cells.push(JSON.stringify(quoted));
     } else {
       while (index < line.length && line[index] !== ',') {
         if (line[index] === '"') throw new Error('Unexpected CSV quote');
         index++;
       }
+      safeScalar(line.slice(start, index));
       cells.push(line.slice(start, index).trim());
     }
     if (index === line.length) break;
@@ -70,7 +90,7 @@ function parseFields(lines: string[]): Record<string, unknown> {
     const object: Record<string, unknown> = Object.create(null);
     while (index < lines.length) {
       const raw = lines[index]!;
-      if (raw.includes('\t')) throw new Error('KAP/2 tabs are forbidden');
+      checkStructure(raw);
       const leading = raw.length - raw.trimStart().length;
       if (leading < indent) break;
       if (leading !== indent) throw new Error('Invalid KAP/2 indentation');
@@ -107,6 +127,7 @@ function parseFields(lines: string[]): Record<string, unknown> {
           if (row === undefined || !row.startsWith(' '.repeat(indent + 2)) || row.startsWith(' '.repeat(indent + 3))) {
             throw new Error('Wrong KAP/2 row count or indentation');
           }
+          checkStructure(row);
           index++;
           const content = row.slice(indent + 2);
           if (headers) {
@@ -139,7 +160,9 @@ function parseFields(lines: string[]): Record<string, unknown> {
 /** One complete envelope only; does not execute tools or repair invalid payloads. */
 export function parseKAP2(raw: string): KAPMessage {
   if (typeof raw !== 'string' || new TextEncoder().encode(raw).length > MAX_SIZE) throw new Error('KAP/2 exceeds 64 KiB');
-  const lines = raw.trim().split(/\r?\n/);
+  if (raw.includes('\ufeff')) throw new Error('KAP/2 BOM is forbidden');
+  const lines = raw.replace(/^[ \n\r]+|[ \n\r]+$/g, '').split(/\r?\n/);
+  if (lines.some(line => line.includes('\r'))) throw new Error('Stray KAP/2 carriage return');
   if (lines.length > MAX_LINES || lines.at(-1) !== 'K2/END') throw new Error('Missing K2/END');
   const header = /^K2 ([TFWQ])(?: ([A-Za-z0-9_.:-]{1,64}))?$/.exec(lines[0] ?? '');
   if (!header) throw new Error('Invalid K2 header');
@@ -147,6 +170,7 @@ export function parseKAP2(raw: string): KAPMessage {
   const tool = header[2] ?? null;
   if ((kind === 'T') !== (tool !== null)) throw new Error('Invalid K2 tool declaration');
   const body = lines.slice(1, -1);
+  if ((kind === 'W' || kind === 'Q') && body.length) throw new Error('KAP/2 W/Q body not allowed');
   if (kind !== 'T' && body.length === 0) {
     if (kind === 'F') throw new Error('Empty K2 final');
     return { action: kind === 'W' ? 'request_workspace' : 'request_tools', tool: null, tool_input: null, content: null, reasoning_summary: '', loop: null };
