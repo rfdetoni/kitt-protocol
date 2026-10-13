@@ -24,6 +24,27 @@ _DECIMAL = re.compile(r"-?(?:0|[1-9][0-9]*)\.[0-9]+\Z")
 _DENIED = frozenset(("__proto__", "prototype", "constructor"))
 
 
+def _safe_scalar(value: str) -> None:
+    """Reject Unicode that cannot round-trip through UTF-8 or host JSON."""
+    if any(0xD800 <= ord(ch) <= 0xDFFF or ord(ch) < 32 or ord(ch) == 127 for ch in value):
+        raise ProtocolError("Invalid KAP/2 Unicode/control scalar")
+
+
+def _check_structure(line: str) -> None:
+    if "\t" in line:
+        raise ProtocolError("KAP/2 tabs are forbidden")
+    if line.endswith(" "):
+        raise ProtocolError("KAP/2 trailing whitespace")
+    _safe_scalar(line.replace("\n", ""))
+
+
+def _safe_utf8_length(raw: str) -> int:
+    try:
+        return len(raw.encode("utf-8", "strict"))
+    except UnicodeError as exc:
+        raise ProtocolError("Invalid KAP/2 UTF-8") from exc
+
+
 def _atom(text: str) -> Any:
     if text.startswith('"'):
         try:
@@ -32,7 +53,11 @@ def _atom(text: str) -> Any:
             raise ProtocolError("Invalid KAP/2 quoted scalar") from exc
         if not isinstance(value, str):
             raise ProtocolError("Quoted KAP/2 scalar must be a string")
+        _safe_scalar(value)
         return value
+    _safe_scalar(text)
+    if text == "-0" or (_DECIMAL.fullmatch(text) and text.startswith("-") and float(text) == 0):
+        raise ProtocolError("Noncanonical negative zero")
     if text == "true":
         return True
     if text == "false":
@@ -76,12 +101,14 @@ def _csv(line: str) -> list[str]:
                 raise ProtocolError("Unterminated KAP/2 CSV quote")
             if i < len(line) and line[i] != ',':
                 raise ProtocolError("Invalid KAP/2 CSV delimiter")
+            _safe_scalar("".join(value))
             cells.append(json.dumps("".join(value)))
         else:
             while i < len(line) and line[i] != ',':
                 if line[i] == '"':
                     raise ProtocolError("Unquoted KAP/2 CSV quote")
                 i += 1
+            _safe_scalar(line[start:i])
             cells.append(line[start:i].strip())
         if i == len(line):
             break
@@ -91,12 +118,16 @@ def _csv(line: str) -> list[str]:
 
 def decode_kap2_content(raw: str) -> dict[str, Any]:
     """Decode exactly one structured K2 F envelope, without implicit repair."""
-    if not isinstance(raw, str) or len(raw.encode("utf-8")) > _MAX_BYTES:
+    if not isinstance(raw, str) or _safe_utf8_length(raw) > _MAX_BYTES:
         raise ProtocolError("KAP/2 exceeds 64 KiB")
-    lines = raw.strip().split("\n")
+    if "\ufeff" in raw:
+        raise ProtocolError("KAP/2 BOM is forbidden")
+    lines = raw.strip(" \n\r").split("\n")
     if len(lines) > _MAX_LINES or lines[0].rstrip("\r") != "K2 F" or lines[-1].rstrip("\r") != "K2/END":
         raise ProtocolError("Expected a complete structured K2 F envelope")
-    body = [line.rstrip("\r") for line in lines[1:-1]]
+    body = [line[:-1] if line.endswith("\r") else line for line in lines[1:-1]]
+    if any("\r" in line for line in body):
+        raise ProtocolError("Stray KAP/2 carriage return")
     index = 0
 
     def parse(indent: int, depth: int) -> dict[str, Any]:
@@ -106,8 +137,7 @@ def decode_kap2_content(raw: str) -> dict[str, Any]:
         result: dict[str, Any] = {}
         while index < len(body):
             raw_line = body[index]
-            if "\t" in raw_line:
-                raise ProtocolError("KAP/2 tabs are forbidden")
+            _check_structure(raw_line)
             spaces = len(raw_line) - len(raw_line.lstrip(" "))
             if spaces < indent:
                 break
@@ -146,6 +176,7 @@ def decode_kap2_content(raw: str) -> dict[str, Any]:
                 for _ in range(count):
                     if index >= len(body) or not body[index].startswith(" " * (indent + 2)) or body[index].startswith(" " * (indent + 3)):
                         raise ProtocolError("Wrong KAP/2 row count or indentation")
+                    _check_structure(body[index])
                     row = body[index][indent + 2:]
                     index += 1
                     if headers:
