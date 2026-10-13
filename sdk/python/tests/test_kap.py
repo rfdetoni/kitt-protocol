@@ -1,5 +1,5 @@
 import unittest
-from kitt_protocol import decode_kap_content
+from kitt_protocol import decode_kap_content, decode_kap2_content
 
 
 class KAPContentTests(unittest.TestCase):
@@ -28,6 +28,32 @@ class KAPContentTests(unittest.TestCase):
         for lines in bad:
             with self.subTest(lines=lines), self.assertRaises(ValueError):
                 decode_kap_content("\n".join(lines))
+
+    def test_compact_tabular_final(self):
+        result = decode_kap_content("\\n".join((
+            "K2 F", "tasks[2]{id,done}:",
+            "  T01,true", "  T02,false", "meta:", "  rev: 2", "K2/END"
+        )))
+        self.assertEqual(result, {
+            "tasks": [{"id": "T01", "done": True}, {"id": "T02", "done": False}],
+            "meta": {"rev": 2}
+        })
+
+    def test_compact_literal_keeps_raw_code(self):
+        result = decode_kap2_content(
+            "K2 F\\nsource<<CODE\\nprint(\\\"hello\\\")\\nK2/END\\nCODE\\nK2/END"
+        )
+        self.assertEqual(result["source"], 'print("hello")\\nK2/END')
+
+    def test_compact_rejects_unsafe_or_ambiguous(self):
+        for payload in (
+            "K2 F\\n__proto__:\\n  value: x\\nK2/END",
+            "K2 F\\npath: 1\\npath: 2\\nK2/END",
+            "K2 F\\nitems[2]{id}:\\n  T01\\nK2/END",
+            "K2 F\\nsource<<CODE\\npartial\\nK2/END",
+        ):
+            with self.subTest(payload=payload), self.assertRaises(ValueError):
+                decode_kap2_content(payload)
 
 
 if __name__ == "__main__":
