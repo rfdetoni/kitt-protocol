@@ -1,4 +1,4 @@
-## Release 0.12.0 — KAP/2 compact agent output
+## Release 0.12.1 — KAP/2 compact agent output
 
 The model-facing [KAP/2 contract](docs/KAP2.md) reduces repetitive fields through indented objects, typed scalar values, tabular arrays and literal source blocks. Host transport, authorization and validation are unchanged.
 
