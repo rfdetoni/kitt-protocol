@@ -1,0 +1,6 @@
+K2 F
+source<<CODE
+print('ok')
+K2/END
+CODE
+K2/END
