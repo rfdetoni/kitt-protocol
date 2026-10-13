@@ -1,0 +1,12 @@
+{
+  "tasks": [
+    {
+      "local_id": "t1",
+      "check_ids": [
+        "node.typecheck"
+      ],
+      "depends_on": [],
+      "note": "line 1"
+    }
+  ]
+}
