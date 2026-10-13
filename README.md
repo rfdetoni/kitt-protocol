@@ -1,3 +1,7 @@
+## Release 0.12.0 — KAP/2 compact agent output
+
+The model-facing [KAP/2 contract](docs/KAP2.md) reduces repetitive fields through indented objects, typed scalar values, tabular arrays and literal source blocks. Host transport, authorization and validation are unchanged.
+
 ## Release 0.11.0 — KAP/1 textual WebChat actions
 
 The Agent v4 contract uses [KAP/1](docs/KAP.md) instead of model-authored JSON envelopes. The host retains typed and OpenAI-compatible JSON transport.
