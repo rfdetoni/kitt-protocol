@@ -1,0 +1,11 @@
+K2 F
+tasks[1]:
+  -
+    local_id: t1
+    check_ids[1]:
+      - node.typecheck
+    depends_on[0]:
+    note<<TXT
+line 1
+TXT
+K2/END

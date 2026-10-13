@@ -186,7 +186,26 @@ def agent_response_parity() -> None:
         compare(name, *values)
 
 
+
+def kap2_limits_parity() -> None:
+    """KAP/2 resource bounds must be identical in both SDKs."""
+    pairs = (
+        ("_MAX_BYTES", "MAX_SIZE", 65536),
+        ("_MAX_LINES", "MAX_LINES", 3000),
+        ("_MAX_DEPTH", "MAX_DEPTH", 20),
+        ("_MAX_ITEMS", "MAX_ROWS", 1024),
+    )
+    py = read("sdk/python/kitt_protocol/kap2.py")
+    ts = read("sdk/typescript/src/kap2.ts")
+    for p, t, expected in pairs:
+        match_py = re.search(rf"(?m)^{p}\s*=\s*(\d+)", py)
+        match_ts = re.search(rf"\b{t}\s*=\s*(\d+)", ts)
+        if not match_py or not match_ts or int(match_py.group(1)) != expected or int(match_ts.group(1)) != expected:
+            fail(f"KAP/2 bounded constant mismatch: {p}/{t}")
+
+
 def main() -> int:
+    kap2_limits_parity()
     agent_response_parity()
     provider_argument_limit_parity()
     required_memory_remember_fields()
