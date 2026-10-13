@@ -6,6 +6,7 @@ import re
 from typing import Any
 
 from .models import ProtocolError
+from .kap2 import decode_kap2_content
 
 _FIELD = re.compile(r"(STRING|INTEGER|DECIMAL|BOOLEAN|NULL|ARRAY|OBJECT) ([A-Za-z0-9_.]+)(?: = (.*))?\Z")
 _SEGMENT = re.compile(r"[A-Za-z_][A-Za-z0-9_]*|0|[1-9][0-9]{0,4}\Z")
@@ -15,6 +16,8 @@ _MISSING = object()
 
 def decode_kap_content(raw: str) -> dict[str, Any]:
     """Parse exactly one bounded KAP FINAL containing structured content."""
+    if isinstance(raw, str) and raw.strip().startswith("K2 F"):
+        return decode_kap2_content(raw)
     if not isinstance(raw, str) or len(raw.encode("utf-8")) > 65536:
         raise ProtocolError("KAP exceeds 64 KiB")
     text = raw.strip()
