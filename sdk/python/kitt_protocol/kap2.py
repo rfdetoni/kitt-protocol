@@ -225,6 +225,8 @@ def _compact_json_object(raw: str) -> dict[str, Any]:
             raw, object_pairs_hook=unique,
             parse_constant=lambda _: _fail("Non-finite compact JSON", "E_SCALAR"),
         )
+    except KAP2Error:
+        raise
     except (TypeError, ValueError, RecursionError) as exc:
         _fail(f"Invalid compact JSON: {type(exc).__name__}", "E_COMPACT_JSON")
     if not isinstance(obj, dict) or not obj:
