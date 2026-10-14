@@ -1,3 +1,7 @@
+## Protocol 0.13.2 — KAP wire version negotiation
+
+The Python and TypeScript SDKs share `X-Kitt-KAP` with an exact `KAP/2` selection. Missing headers preserve deployed legacy requests; unsupported, ambiguous or malformed versions fail closed without a downgrade. This is transport metadata only; model output never grants authority. See [KAP/2 negotiation](docs/KAP2.md).
+
 ## Protocol 0.13.1 — cross-consumer type compatibility
 
 KAP/2 diagnostics work with strict TypeScript optional-property type checking. This patch does not change the model-facing grammar.

@@ -1,5 +1,17 @@
 # KAP/2 — compact model-facing actions
 
+## Exact version negotiation (Protocol 0.13.2)
+
+Agent HTTP requests may declare `X-Kitt-KAP: KAP/2`. The Proxy selects
+the exact deployed version and acknowledges with `X-Kitt-KAP: KAP/2`.
+Unknown versions, comma-separated lists, whitespace variants and empty
+headers fail closed; there is no model-authored version negotiation and no
+implicit downgrade. Missing request headers preserve compatibility with
+previously deployed KAP/2 clients. This does not change HTTP JSON, KITT
+Agent Contract v4, host authorization, or the grammar of `K2 T/F/W/Q`.
+The current supported list contains only `KAP/2`.
+
+
 KAP/2 0.13.0 is a bounded deterministic, TOON-inspired textual grammar. **The grammar never grants authority**: the host validates declared tools, parameters, approvals, identity, resource policy and completion. HTTP JSON, Rust IPC and Envelope v1 remain independent. KAP/1 remains a separate legacy format.
 
 ## Grammar (ABNF with context-dependent semantics)

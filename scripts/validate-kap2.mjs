@@ -3,6 +3,11 @@ import {readFileSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {parseKAP2, encodeKAP2, KAP2Error} from '../.test-sdk/kap2.js';
 
+import {KAP_VERSION_HEADER, negotiateKAPVersion, KAPNegotiationError} from '../.test-sdk/kap-version.js';
+assert.equal(KAP_VERSION_HEADER, 'X-Kitt-KAP');
+assert.equal(negotiateKAPVersion(undefined), 'KAP/2');
+assert.equal(negotiateKAPVersion('KAP/2'), 'KAP/2');
+for (const bad of ['KAP/1', 'KAP/3', 'KAP/2,KAP/1', ' KAP/2', '']) assert.throws(() => negotiateKAPVersion(bad), KAPNegotiationError);
 const root = 'fixtures/kap2';
 function entries(dir) { return readdirSync(join(root,dir)).filter(name=>name.endsWith('.k2')).sort(); }
 let checked = 0;

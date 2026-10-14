@@ -1,3 +1,9 @@
+## 0.13.2
+
+- Export a cross-language `X-Kitt-KAP` negotiation contract selecting only deployed `KAP/2`.
+- Explicit, ambiguous or unsupported versions are rejected; absent header preserves pre-negotiation clients.
+- Model grammar and host authorization are unchanged.
+
 ## 0.13.1
 
 - Fix shared KAP2Error construction under TypeScript exactOptionalPropertyTypes, preserving optional metadata without assigning undefined.
