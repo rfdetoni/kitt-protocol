@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "local_id": "T00",
+      "kind": "task",
+      "depends_on": []
+    },
+    {
+      "local_id": "FINAL",
+      "kind": "final",
+      "depends_on": [
+        "T00"
+      ]
+    }
+  ]
+}

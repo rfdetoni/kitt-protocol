@@ -143,7 +143,11 @@ function compactJsonFinal(raw: string): KAPMessage | undefined {
   if (/[\r\n]/.test(payload)) fail('Compact JSON requires one physical line', 'E_COMPACT_JSON');
   let parsed: unknown;
   try { parsed = strictJson(payload); }
-  catch { fail('Invalid or duplicate compact JSON', 'E_COMPACT_JSON'); }
+  catch (error) {
+    if (error instanceof Error && error.message === 'duplicate JSON field')
+      fail('Duplicate compact JSON key', 'E_KEY_DUPLICATE');
+    fail('Invalid compact JSON', 'E_COMPACT_JSON');
+  }
   if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)
       || !Object.keys(parsed).length) fail('Compact final requires non-empty object', 'E_COMPACT_JSON');
   function inspect(value: unknown, depth = 0): void {
