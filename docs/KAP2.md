@@ -1,6 +1,6 @@
 # KAP/2 — compact model-facing actions
 
-## Exact version negotiation (Protocol 0.13.2)
+## Exact version negotiation (Protocol 0.13.3)
 
 Agent HTTP requests may declare `X-Kitt-KAP: KAP/2`. The Proxy selects
 the exact deployed version and acknowledges with `X-Kitt-KAP: KAP/2`.
@@ -13,6 +13,28 @@ The current supported list contains only `KAP/2`.
 
 
 KAP/2 0.13.0 is a bounded deterministic, TOON-inspired textual grammar. **The grammar never grants authority**: the host validates declared tools, parameters, approvals, identity, resource policy and completion. HTTP JSON, Rust IPC and Envelope v1 remain independent. KAP/1 remains a separate legacy format.
+
+## Explicit compact final without indentation (Protocol 0.13.3)
+
+For a *structured final response only*, the existing `K2 F` action now
+also accepts a tagged `@json:` body on one physical line:
+
+```text
+K2 F @json: {"items":[{"local_id":"T01","kind":"task","depends_on":[]},{"local_id":"FINAL","kind":"final","depends_on":["T01"]}]} K2/END
+```
+
+The two whitespace boundaries around `@json:` and `K2/END` may instead
+be LF or CRLF. JSON content itself **must remain one line**. This alternative
+uses explicit quoting, braces and arrays, so Markdown whitespace folding
+cannot destroy field boundaries. Existing indented KAP/2 remains the default;
+no implicit conversion from flattened `items[12]` output is permitted.
+K2 T/W/Q, authorization and version negotiation are unchanged.
+
+The `@json:` parser rejects duplicate keys, unsafe keys, non-finite values,
+unpaired surrogates, invalid control characters, oversized payloads and
+nesting/collection limits. A malformed one-line legacy K2 frame returns
+`E_LAYOUT_LOSS` so callers can request a fresh response instead of
+guessing values. The host still validates semantic schemas, tasks and grants.
 
 ## Grammar (ABNF with context-dependent semantics)
 

@@ -1,3 +1,12 @@
+## Protocol 0.13.3 — explicit single-line KAP/2 finals
+
+KAP/2 now optionally permits `K2 F @json: {..} K2/END` for structured
+finals without indentation. The two frame-edge separators can be spaces or
+newlines; all content must be strict JSON on one line. Legacy multiline
+KAP/2 remains the default; flattened legacy fields are rejected with
+`E_LAYOUT_LOSS` rather than heuristically recovered. See
+[the versioned wire contract](docs/KAP2.md).
+
 ## Protocol 0.13.2 — KAP wire version negotiation
 
 The Python and TypeScript SDKs share `X-Kitt-KAP` with an exact `KAP/2` selection. Missing headers preserve deployed legacy requests; unsupported, ambiguous or malformed versions fail closed without a downgrade. This is transport metadata only; model output never grants authority. See [KAP/2 negotiation](docs/KAP2.md).

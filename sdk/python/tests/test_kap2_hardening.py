@@ -75,6 +75,39 @@ class KAP2HardeningTests(unittest.TestCase):
             }),
             {"version": "1.10", "enabled": "true"})
 
+    def test_compact_flat_json_final(self):
+        from kitt_protocol import decode_kap2_frame
+        flat = (
+            'K2 F @json: {"items":[{"local_id":"T00","kind":"task",'
+            '"depends_on":[]},{"local_id":"FINAL","kind":"final",'
+            '"depends_on":["T00"]}]} K2/END'
+        )
+        compact = decode_kap2_frame(flat)
+        self.assertEqual(compact["action"], "final_response")
+        self.assertEqual(compact["content"]["items"][1]["depends_on"], ["T00"])
+        # Frame-edge line breaks are optional, but JSON string boundaries remain exact.
+        wrapped = flat.replace("K2 F @json:", "K2 F\n@json:").replace(
+            "}]} K2/END", "}]}\nK2/END"
+        )
+        self.assertEqual(decode_kap2_frame(wrapped)["content"], compact["content"])
+
+    def test_compact_json_rejects_dup_keys_unsafe_content_and_ambiguous_layout(self):
+        from kitt_protocol import decode_kap2_frame
+        from kitt_protocol.kap2 import KAP2Error
+        invalid = (
+            'K2 F @json: {"items":1,"items":2} K2/END',
+            'K2 F @json: {"__proto__":{}} K2/END',
+            'K2 F @json: {"rows":[{"__proto__":1}]} K2/END',
+            'K2 F @json: {"items":[1,]} K2/END',
+            'K2 F @json: {"items":[]} K2/END K2/END',
+        )
+        for raw in invalid:
+            with self.subTest(raw=raw), self.assertRaises(KAP2Error):
+                decode_kap2_frame(raw)
+        with self.assertRaises(KAP2Error) as cause:
+            decode_kap2_frame('K2 F items[1]: - local_id: T01 K2/END')
+        self.assertEqual(cause.exception.code, "E_LAYOUT_LOSS")
+
     def test_invalid_line_and_crlf(self):
         self.assertEqual(decode_kap2_content(frame("ok: true").replace("\n", "\r\n")),
                          {"ok": True})

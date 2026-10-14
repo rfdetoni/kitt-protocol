@@ -68,7 +68,7 @@ dependencies = [
 
 [[package]]
 name = "kitt-protocol"
-version = "0.13.2"
+version = "0.13.3"
 dependencies = [
  "serde",
  "serde_json",

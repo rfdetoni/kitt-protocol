@@ -185,8 +185,85 @@ def _lines(raw: str) -> list[str]:
     return [line[:-1] if line.endswith("\r") else line for line in lines]
 
 
+def _compact_json_object(raw: str) -> dict[str, Any]:
+    """Parse an explicit linebreak-independent final, without heuristic repair."""
+    def unique(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, val in pairs:
+            if key in result:
+                _fail("Duplicate compact JSON key", "E_KEY_DUPLICATE")
+            if key in _DENIED:
+                _fail("Unsafe compact JSON key", "E_KEY_UNSAFE")
+            result[key] = val
+        return result
+
+    def inspect(value: Any, depth: int = 0) -> None:
+        if depth > _MAX_DEPTH:
+            _fail("Compact JSON depth exceeded", "E_DEPTH")
+        if isinstance(value, dict):
+            if len(value) > _MAX_ITEMS:
+                _fail("Compact JSON object too large", "E_ARRAY_SIZE")
+            for key, item in value.items():
+                _safe(key)
+                inspect(item, depth + 1)
+        elif isinstance(value, list):
+            if len(value) > _MAX_ITEMS:
+                _fail("Compact JSON array too large", "E_ARRAY_SIZE")
+            for item in value:
+                inspect(item, depth + 1)
+        elif isinstance(value, str):
+            _safe(value, literal=True)
+        elif isinstance(value, int) and not isinstance(value, bool):
+            if abs(value) > 2**53 - 1:
+                _fail("Unsafe compact JSON integer", "E_NUMBER_RANGE")
+        elif isinstance(value, float):
+            if not math.isfinite(value):
+                _fail("Non-finite compact JSON number", "E_NUMBER_RANGE")
+
+    try:
+        obj = json.loads(
+            raw, object_pairs_hook=unique,
+            parse_constant=lambda _: _fail("Non-finite compact JSON", "E_SCALAR"),
+        )
+    except (TypeError, ValueError, RecursionError) as exc:
+        _fail(f"Invalid compact JSON: {type(exc).__name__}", "E_COMPACT_JSON")
+    if not isinstance(obj, dict) or not obj:
+        _fail("KAP/2 compact final must be a non-empty JSON object", "E_COMPACT_JSON")
+    inspect(obj)
+    return obj
+
+
+def _flat_final(raw: str, schema: Any) -> dict[str, Any] | None:
+    """The opt-in @json variant survives DOM whitespace folding at frame edges."""
+    if not raw.startswith("K2 F"):
+        return None
+    marker = re.match(r"K2 F(?: |\r?\n)@json: ", raw)
+    if marker is None:
+        if raw.startswith(("K2 F @json:", "K2 F\n@json:", "K2 F\r\n@json:")):
+            _fail("Malformed KAP/2 compact frame", "E_COMPACT_JSON")
+        return None
+    content = raw[marker.end():]
+    terminator = re.search(r"(?: |\r?\n)K2/END\Z", content)
+    if terminator is None:
+        _fail("Missing compact KAP/2 terminator", "E_TERMINATOR")
+    payload = content[:terminator.start()]
+    if "\n" in payload or "\r" in payload:
+        _fail("Compact JSON must remain on one physical line", "E_COMPACT_JSON")
+    parsed = _compact_json_object(payload)
+    return {
+        "action": "final_response", "tool": None, "tool_input": None,
+        "content": parsed, "reasoning_summary": "", "loop": None,
+    }
+
+
+
 def _decode(raw: str, schema: Any = None) -> dict[str, Any]:
     lines = _lines(raw)
+    compact = _flat_final("\n".join(lines), schema)
+    if compact is not None:
+        return compact
+    if len(lines) == 1 and re.match(r"K2 [TFWQ](?: |$)", lines[0]):
+        _fail("KAP/2 frame collapsed into one line; field boundaries unavailable", "E_LAYOUT_LOSS")
     if lines[-1] != "K2/END":
         _fail("Missing K2/END", "E_TERMINATOR")
     header = re.fullmatch(r"K2 ([TFWQ])(?: ([A-Za-z0-9_.:-]{1,64}))?", lines[0])
