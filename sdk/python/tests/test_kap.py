@@ -1,5 +1,5 @@
 import unittest
-from kitt_protocol import decode_kap_content, decode_kap2_content
+from kitt_protocol.kap import decode_kap_content, decode_kap2_content
 
 
 class KAPContentTests(unittest.TestCase):

@@ -1,3 +1,5 @@
+> ARCHIVED: KAP is retained for research only. The active ecosystem uses JSON Agent contract v5. See [0.14.0](RELEASE_0.14.0.md).
+
 # KAP/1 — KITT Action Protocol
 
 KAP is the **model-facing textual syntax** for the Agent contract v4. JSON is still the internal HTTP/OpenAI and host event representation, produced by trusted code. Never treat KAP as authorization.

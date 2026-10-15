@@ -5,7 +5,7 @@ import random
 import unittest
 from pathlib import Path
 
-from kitt_protocol import decode_kap2_content, decode_kap2_frame, encode_kap2, KAP2Error
+from kitt_protocol.kap2 import decode_kap2_content, decode_kap2_frame, encode_kap2, KAP2Error
 
 ROOT = Path(__file__).resolve().parents[3]
 CORPUS = ROOT / "fixtures" / "kap2"

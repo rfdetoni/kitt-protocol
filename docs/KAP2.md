@@ -1,3 +1,5 @@
+> ARCHIVED: KAP is retained for research only. The active ecosystem uses JSON Agent contract v5. See [0.14.0](RELEASE_0.14.0.md).
+
 # KAP/2 — compact model-facing actions
 
 ## Exact version negotiation (Protocol 0.13.3)

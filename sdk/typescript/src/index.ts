@@ -1,7 +1,5 @@
-export { parseKAP, KAPError, type KAPMessage, type KAPAction } from './kap.js';
 export const PROTOCOL_VERSION = 1 as const;
-export { KAP_VERSION_HEADER, KAP_CURRENT_VERSION, KAP_SUPPORTED_VERSIONS, KAPNegotiationError, negotiateKAPVersion } from './kap-version.js';
-export { AGENT_CONTRACT_HEADER, AGENT_CONTRACT_VERSION, AGENT_ROUTE_HEADER, AGENT_RESPONSE_SCHEMA } from './agent-contract.js';
+export { AGENT_CONTRACT_HEADER, AGENT_CONTRACT_VERSION, AGENT_WIRE_FORMAT, AGENT_ROUTE_HEADER, AGENT_RESPONSE_SCHEMA } from './agent-contract.js';
 export { MAX_TOOL_ARGUMENT_BYTES } from './provider-limits.js';
 import { strictJson } from './strict-json.js';
 export function decodeEnvelope(raw: string | Uint8Array): Envelope { return parseEnvelope(strictJson(raw)); }

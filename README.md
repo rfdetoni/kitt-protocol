@@ -1,31 +1,8 @@
-## Protocol 0.13.3 — explicit single-line KAP/2 finals
+# Protocol 0.14.0 — JSON Agent contract v5
 
-KAP/2 now optionally permits `K2 F @json: {..} K2/END` for structured
-finals without indentation. The two frame-edge separators can be spaces or
-newlines; all content must be strict JSON on one line. Legacy multiline
-KAP/2 remains the default; flattened legacy fields are rejected with
-`E_LAYOUT_LOSS` rather than heuristically recovered. See
-[the versioned wire contract](docs/KAP2.md).
+The active model wire format is one JSON object, declared by `X-Kitt-Agent-Contract: v5`. The existing authoritative Agent response schema retains its six fields and host validation semantics. Structured final data lives in `content`; tool requests use `action: use_tool`, an exact host tool name and an object `tool_input`.
 
-## Protocol 0.13.2 — KAP wire version negotiation
-
-The Python and TypeScript SDKs share `X-Kitt-KAP` with an exact `KAP/2` selection. Missing headers preserve deployed legacy requests; unsupported, ambiguous or malformed versions fail closed without a downgrade. This is transport metadata only; model output never grants authority. See [KAP/2 negotiation](docs/KAP2.md).
-
-## Protocol 0.13.1 — cross-consumer type compatibility
-
-KAP/2 diagnostics work with strict TypeScript optional-property type checking. This patch does not change the model-facing grammar.
-
-## KAP/2 0.13.0 — strict text contract
-
-The Python and TypeScript SDKs implement the [KAP/2 grammar](docs/KAP2.md), golden corpus, differential fuzz and typed diagnostics. See [the RFC](docs/KAP2-roadmap.md) for host-dependent features not enabled in this release.
-
-## Release 0.12.1 — KAP/2 compact agent output
-
-The model-facing [KAP/2 contract](docs/KAP2.md) reduces repetitive fields through indented objects, typed scalar values, tabular arrays and literal source blocks. Host transport, authorization and validation are unchanged.
-
-## Release 0.11.0 — KAP/1 textual WebChat actions
-
-The Agent v4 contract uses [KAP/1](docs/KAP.md) instead of model-authored JSON envelopes. The host retains typed and OpenAI-compatible JSON transport.
+[Release details](docs/RELEASE_0.14.0.md).
 
 ## Release 0.10.0 — Agent contract v3
 

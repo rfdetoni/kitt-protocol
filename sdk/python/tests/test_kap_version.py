@@ -1,5 +1,5 @@
 import unittest
-from kitt_protocol import KAP_CURRENT_VERSION, KAP_VERSION_HEADER, KAPNegotiationError, negotiate_kap_version
+from kitt_protocol.kap_version import KAP_CURRENT_VERSION, KAP_VERSION_HEADER, KAPNegotiationError, negotiate_kap_version
 
 
 class NegotiationTests(unittest.TestCase):

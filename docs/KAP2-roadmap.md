@@ -1,3 +1,5 @@
+> ARCHIVED: KAP is retained for research only. The active ecosystem uses JSON Agent contract v5. See [0.14.0](RELEASE_0.14.0.md).
+
 # KAP/2 roadmap — proposals, not activated
 
 This RFC describes syntax proposals that require explicit host support, capability negotiation and end-to-end approval. None of these proposals is executable in Protocol 0.13.0.

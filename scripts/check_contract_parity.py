@@ -171,7 +171,7 @@ def provider_argument_limit_parity() -> None:
 
 
 def agent_response_parity() -> None:
-    names = ("AGENT_CONTRACT_HEADER", "AGENT_CONTRACT_VERSION", "AGENT_ROUTE_HEADER")
+    names = ("AGENT_CONTRACT_HEADER", "AGENT_CONTRACT_VERSION", "AGENT_WIRE_FORMAT", "AGENT_ROUTE_HEADER")
     for name in names:
         values = []
         for label, path, pattern in (

@@ -1,6 +1,6 @@
 """KAP/2 regression tests. Intentional red tests before hardening."""
 import unittest
-from kitt_protocol import decode_kap2_content
+from kitt_protocol.kap2 import decode_kap2_content
 from kitt_protocol.models import ProtocolError
 
 
@@ -62,13 +62,13 @@ class KAP2HardeningTests(unittest.TestCase):
                                      "depends_on": [], "note": "some text"}]})
 
     def test_summary(self):
-        from kitt_protocol import decode_kap2_frame
+        from kitt_protocol.kap2 import decode_kap2_frame
         response = decode_kap2_frame(frame("@summary: checked", "ok: true"))
         self.assertEqual(response["reasoning_summary"], "checked")
         self.assertEqual(response["content"], {"ok": True})
 
     def test_schema_guided_scalar(self):
-        from kitt_protocol import decode_kap2_content
+        from kitt_protocol.kap2 import decode_kap2_content
         self.assertEqual(
             decode_kap2_content(frame("version: 1.10", "enabled: true"), schema={
                 "type": "object", "properties": {"version": {"type": "string"}, "enabled": {"type": "string"}}
@@ -76,7 +76,7 @@ class KAP2HardeningTests(unittest.TestCase):
             {"version": "1.10", "enabled": "true"})
 
     def test_compact_flat_json_final(self):
-        from kitt_protocol import decode_kap2_frame
+        from kitt_protocol.kap2 import decode_kap2_frame
         flat = (
             'K2 F @json: {"items":[{"local_id":"T00","kind":"task",'
             '"depends_on":[]},{"local_id":"FINAL","kind":"final",'
@@ -92,7 +92,7 @@ class KAP2HardeningTests(unittest.TestCase):
         self.assertEqual(decode_kap2_frame(wrapped)["content"], compact["content"])
 
     def test_compact_json_rejects_dup_keys_unsafe_content_and_ambiguous_layout(self):
-        from kitt_protocol import decode_kap2_frame
+        from kitt_protocol.kap2 import decode_kap2_frame
         from kitt_protocol.kap2 import KAP2Error
         invalid = (
             'K2 F @json: {"items":1,"items":2} K2/END',
