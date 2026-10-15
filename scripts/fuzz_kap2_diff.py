@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "sdk/python"))
-from kitt_protocol import decode_kap2_frame  # noqa: E402
+from kitt_protocol.kap2 import decode_kap2_frame  # noqa: E402
 from kitt_protocol.models import ProtocolError  # noqa: E402
 
 rng = random.Random(3202)
