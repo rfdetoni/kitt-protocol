@@ -18,7 +18,7 @@ LEAK = [
     re.compile(r"\b(?:rtlp[a-z0-9_]+|basep[a-z0-9_]+)\b", re.I),
     re.compile(r"\b(?:goto|sizeof|__asm|assembly|decompil\w*|disassembl\w*|stack\s*offset|stack\s*slot|register\s+[a-z0-9]+|ghidra|rizin|radare2)\b", re.I),
     re.compile(r"(?:0x[0-9a-f]{10,}|\b[A-Za-z0-9+/]{96,}={0,2}\b)", re.I),
-    re.compile(r"(?:[{};]|->|/\*|\*/|\\x[0-9a-f]{2}|\\u[0-9a-f]{4})", re.I),
+    re.compile(r"(?:[{};]|->|/\*|\*/|\\x[0-9a-f]{2}|\\u[0-9a-f]{4}|\b(?:if\s*\(|while\s*\(|for\s*\(|return\s+|mov\s+[a-z]+\s*,))", re.I),
 ]
 
 
@@ -63,7 +63,7 @@ def validate_cleanroom_contract(value):
     _object(value, TOP, "contract")
     _text(value["target_dll"], "target_dll", 100, DLL)
     _text(value["function_name"], "function_name", 128, IDENT)
-    if value["calling_convention"] not in {"WINAPI", "CDECL", "FASTCALL", "THISCALL"}:
+    if not isinstance(value["calling_convention"], str) or value["calling_convention"] not in {"WINAPI", "CDECL", "FASTCALL", "THISCALL"}:
         raise CleanRoomContractError("invalid calling convention")
     sig = value["signature"]
     _object(sig, SIG, "signature")
@@ -79,7 +79,7 @@ def validate_cleanroom_contract(value):
             raise CleanRoomContractError("duplicate parameter")
         names.add(name)
         _text(item["c_type"], "c_type", 120)
-        if item["direction"] not in {"IN", "OUT", "IN_OUT", "OPT"}:
+        if not isinstance(item["direction"], str) or item["direction"] not in {"IN", "OUT", "IN_OUT", "OPT"}:
             raise CleanRoomContractError("invalid direction")
     cases = value["observed_behaviors"]
     if not isinstance(cases, list) or not 1 <= len(cases) <= 128:
