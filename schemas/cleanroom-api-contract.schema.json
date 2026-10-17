@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kitt.dev/schemas/cleanroom-api-contract.schema.json",
+  "title": "KITT Clean-Room API Contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "target_dll",
+    "function_name",
+    "signature",
+    "calling_convention",
+    "observed_behaviors"
+  ],
+  "properties": {
+    "target_dll": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,96}\\.dll$"
+    },
+    "function_name": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,127}$"
+    },
+    "calling_convention": {
+      "type": "string",
+      "enum": [
+        "WINAPI",
+        "CDECL",
+        "FASTCALL",
+        "THISCALL"
+      ]
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "return_type",
+        "parameters"
+      ],
+      "properties": {
+        "return_type": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "parameters": {
+          "type": "array",
+          "maxItems": 48,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "c_type",
+              "direction"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]{0,95}$"
+              },
+              "c_type": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "IN",
+                  "OUT",
+                  "IN_OUT",
+                  "OPT"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "observed_behaviors": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "case_id",
+          "input_conditions",
+          "expected_return",
+          "last_error",
+          "side_effects"
+        ],
+        "properties": {
+          "case_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+          },
+          "input_conditions": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 640
+          },
+          "expected_return": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "last_error": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "side_effects": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 640
+          }
+        }
+      }
+    }
+  }
+}
