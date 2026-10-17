@@ -1,3 +1,7 @@
+# Protocol 0.14.1 — Clean-Room public API contracts
+
+Strict black-box schema and Python decoder for Wine/ReactOS behavioral handoff, independent of the existing Agent v5 JSON wire. Human review and OS isolation are separately required. [Release details](docs/RELEASE_0.14.1.md).
+
 # Protocol 0.14.0 — JSON Agent contract v5
 
 The active model wire format is one JSON object, declared by `X-Kitt-Agent-Contract: v5`. The existing authoritative Agent response schema retains its six fields and host validation semantics. Structured final data lives in `content`; tool requests use `action: use_tool`, an exact host tool name and an object `tool_input`.
