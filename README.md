@@ -1,6 +1,6 @@
 # K.I.T.T. Protocol
 
-Versão **0.14.1**. Contratos canônicos e SDKs Rust, Python e TypeScript. [Histórico de versões](CHANGELOG.md) · [Notas da versão atual](docs/RELEASE_0.14.1.md).
+Versão **0.14.2**. Contratos canônicos e SDKs Rust, Python e TypeScript. [Histórico de versões](CHANGELOG.md) · [Notas da versão atual](docs/RELEASE_0.14.2.md).
 
 ## Memory 0.9 additions
 
