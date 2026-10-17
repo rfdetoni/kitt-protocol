@@ -1,47 +1,6 @@
-# Protocol 0.14.1 — Clean-Room public API contracts
-
-Strict black-box schema and Python decoder for Wine/ReactOS behavioral handoff, independent of the existing Agent v5 JSON wire. Human review and OS isolation are separately required. [Release details](docs/RELEASE_0.14.1.md).
-
-# Protocol 0.14.0 — JSON Agent contract v5
-
-The active model wire format is one JSON object, declared by `X-Kitt-Agent-Contract: v5`. The existing authoritative Agent response schema retains its six fields and host validation semantics. Structured final data lives in `content`; tool requests use `action: use_tool`, an exact host tool name and an object `tool_input`.
-
-[Release details](docs/RELEASE_0.14.0.md).
-
-## Release 0.10.0 — Agent contract v3
-
-Agent responses may carry structured result objects directly in content. The authoritative response schema and wire identifiers are exported to the SDKs; strict object decoding rejects duplicate fields and extra decisions. Upgrade Agent CLI and Reverse Proxy together. See [release notes](docs/RELEASE_0.10.0.md).
-
 # K.I.T.T. Protocol
 
-## Release 0.9.2 — Provider argument limit contract
-
-Python and TypeScript SDKs export MAX_TOOL_ARGUMENT_BYTES (65,536 bytes). The limit includes the serialized JSON and UTF-8 escaping. Producers reject larger tool arguments before dispatch, and consumers enforce the same boundary. Envelope protocol versions and memory schemas are unchanged.
-
-See [release notes](docs/RELEASE_0.9.2.md).
-
-## Release 0.9.1 — execution boundary hardening
-
-Reject duplicate JSON keys, non-finite numbers and invalid UTF-8 at the public wire decoders. Python requires an integer version; Rust requires the payload field (explicit null remains valid). Add shared adversarial wire fixtures and exercise the public TypeScript decoders. Wire version remains 1.
-
-See [release notes](docs/RELEASE_0.9.1.md).
-
-<p align="center">
-  <strong>Versioned, language-neutral contracts for the K.I.T.T. ecosystem.</strong><br>
-  JSON Schema · Rust · Python · TypeScript · bounded framing · transport-agnostic IPC
-</p>
-
-<p align="center">
-  <a href="https://github.com/rfdetoni/kitt-protocol/blob/main/LICENSE"><img alt="License MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
-  <img alt="Protocol v1" src="https://img.shields.io/badge/protocol-v1-6f42c1">
-  <img alt="SDKs" src="https://img.shields.io/badge/SDKs-Rust%20%7C%20Python%20%7C%20TypeScript-lightgrey">
-</p>
-
-K.I.T.T. Protocol defines the external contracts used between independently packaged K.I.T.T. components. Canonical JSON Schemas are paired with small SDKs so the Agent, Assistant, Memory, workers and native services can evolve without duplicating transport logic or coupling their implementations.
-
-Protocol **0.9.0** keeps Envelope protocol v1 and extends the shared memory contract without changing framing. Memory now has progressive `search/timeline/get` messages with explicit token budgets; conversation runtime bindings, context-segment reconciliation and tool-execution receipts are shared value contracts rather than Agent-local DTOs. `KittRequestMetadata`, typed ContextEnvelope data, tools and correlation remain structural rather than prompt-derived.
-
----
+Versão **0.14.1**. Contratos canônicos e SDKs Rust, Python e TypeScript. [Histórico de versões](CHANGELOG.md) · [Notas da versão atual](docs/RELEASE_0.14.1.md).
 
 ## Memory 0.9 additions
 
@@ -238,7 +197,6 @@ Prefer additive, versioned evolution over silent wire-format changes. A protocol
 
 MIT. See [LICENSE](LICENSE).
 
-
 ## Memory contract 0.2
 
 Package version 0.2.1 keeps envelope protocol **v1** and extends memory payloads additively. `scope_key` identifies a conversation when `scope = "conversation"`; `as_of` enables point-in-time recall; recalled DTOs may include `scope_key`. Workspace/global callers may omit both fields.
@@ -249,7 +207,6 @@ Rust consumers must update struct literals because these additional fields are a
 ### Python support policy
 
 KITT Protocol 0.2.1 declares Python **3.14+** for its Python SDK. This matches the ecosystem policy of supporting and continuously validating only the current Python interpreter rather than advertising older minors that are no longer exercised by CI. Rust/TypeScript wire semantics are unchanged.
-
 
 ## Semantic contracts 0.3
 
@@ -270,8 +227,6 @@ Surface contracts describe declarative components, bounded state, revisioned pat
 ### Backend IR v1
 
 Backend IR represents schemas, entities, queries, commands, endpoints, events, workflows, policies, jobs and observability resources. It is an intent/plan representation, not executable code. Validation, impact analysis, approvals and compilation remain host responsibilities.
-
-
 
 ## Memory service control plane (0.4)
 
