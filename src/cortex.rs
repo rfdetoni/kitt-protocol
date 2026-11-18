@@ -45,7 +45,10 @@ impl CortexEvent {
         if !(1..=5).contains(&self.severity) {
             return Err("invalid Cortex severity".into());
         }
-        if !matches!(self.sensitivity.as_str(), "public" | "personal" | "private" | "secret" | "ephemeral") {
+        if !matches!(
+            self.sensitivity.as_str(),
+            "public" | "personal" | "private" | "secret" | "ephemeral"
+        ) {
             return Err("invalid Cortex sensitivity".into());
         }
         if !self.payload.is_object() {
@@ -54,7 +57,11 @@ impl CortexEvent {
         if !self.created.is_finite() || !self.expires.is_finite() || self.expires <= self.created {
             return Err("invalid Cortex event lifetime".into());
         }
-        if serde_json::to_vec(&self.payload).map_err(|e| e.to_string())?.len() > 16 * 1024 {
+        if serde_json::to_vec(&self.payload)
+            .map_err(|e| e.to_string())?
+            .len()
+            > 16 * 1024
+        {
             return Err("Cortex event payload exceeds 16 KiB".into());
         }
         Ok(())
@@ -64,8 +71,9 @@ impl CortexEvent {
 fn valid_name(value: &str) -> bool {
     value.len() <= 80
         && value.starts_with(|c: char| c.is_ascii_lowercase())
-        && value.bytes().all(|b| b.is_ascii_lowercase() || b.is_ascii_digit()
-            || matches!(b, b'_' | b'-' | b'.'))
+        && value.bytes().all(|b| {
+            b.is_ascii_lowercase() || b.is_ascii_digit() || matches!(b, b'_' | b'-' | b'.')
+        })
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -127,7 +135,8 @@ mod tests {
             "id": "evt.42", "topic": "saas.error.500", "source": "external.webhook",
             "severity": 6, "untrusted": true, "sensitivity": "private",
             "payload": {}, "created": 100.0, "expires": 200.0
-        })).unwrap();
+        }))
+        .unwrap();
         assert!(event.validate().is_err());
     }
 
@@ -135,7 +144,8 @@ mod tests {
     fn preserve_governor_wire_values() {
         let v: CortexPreflight = serde_json::from_value(json!({
             "tier": "YELLOW", "decision": "REQUIRE_APPROVAL", "reason": "cross-domain"
-        })).unwrap();
+        }))
+        .unwrap();
         assert_eq!(v.tier, CortexAutonomyTier::Yellow);
         assert_eq!(v.decision, CortexPreflightDecision::RequireApproval);
     }
