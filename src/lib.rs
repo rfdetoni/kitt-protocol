@@ -8,6 +8,9 @@ use serde_json::Value;
 use uuid::Uuid;
 mod strict_json;
 
+mod cortex;
+pub use cortex::*;
+
 mod agentic;
 pub use agentic::*;
 
