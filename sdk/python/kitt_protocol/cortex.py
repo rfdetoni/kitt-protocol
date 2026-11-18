@@ -1,7 +1,7 @@
 """Cross-process Cortex event contracts; data alone never grants tool authority."""
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 
@@ -38,8 +38,7 @@ class CortexEvent:
 
 
 @dataclass(frozen=True)
-class CortexDelivery:
-    event: CortexEvent
+class CortexDelivery(CortexEvent):
     attempt: int
     lease_token: str
 
