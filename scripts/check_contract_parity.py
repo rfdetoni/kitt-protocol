@@ -135,7 +135,10 @@ def agentic_planning_fields() -> None:
     rust = read("src/agentic.rs")
     ts = read("sdk/typescript/src/index.ts")
     schema = json.loads(read("schemas/agentic-planning.schema.json"))["$defs"]
-    for name in ("KittRequestMetadata", "HostExecutionState", "PlanTaskProposal", "PlanProposal", "SubagentReport"):
+    for name in (
+        "KittRequestMetadata", "HostExecutionState", "PlanTaskProposal", "PlanProposal",
+        "SubagentReport", "ConversationRuntimeBinding", "ToolExecutionReceipt",
+    ):
         cls = next(n for n in python_module.body if isinstance(n, ast.ClassDef) and n.name == name)
         py_fields = {n.target.id for n in cls.body if isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name)}
         rust_block = re.search(rf"pub struct {name} \{{([^}}]+)\}}", rust).group(1)
@@ -146,6 +149,25 @@ def agentic_planning_fields() -> None:
             ("typescript", set(re.findall(r"(\w+)\??\s*:", ts_block))),
             ("schema", set(schema[name]["properties"])),
         )
+
+
+def runtime_backend_parity() -> None:
+    module = ast.parse(read("sdk/python/kitt_protocol/agentic.py"))
+    cls = next(n for n in module.body if isinstance(n, ast.ClassDef) and n.name == "RuntimeBackend")
+    python = {
+        node.value.value for node in cls.body
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.Constant)
+    }
+    rust = re.search(r"pub enum RuntimeBackend \{([^}]+)\}", read("src/agentic.rs")).group(1)
+    rust_values = {snake(value).upper() for value in re.findall(r"\b([A-Z][A-Za-z0-9_]*)\s*,", rust)}
+    schema = json.loads(read("schemas/agentic-planning.schema.json"))
+    compare(
+        "RuntimeBackend",
+        ("python", python),
+        ("rust", rust_values),
+        ("typescript", ts_union("RuntimeBackend")),
+        ("schema", set(schema["$defs"]["ConversationRuntimeBinding"]["properties"]["backend"]["enum"])),
+    )
 
 
 def provider_argument_limit_parity() -> None:
@@ -210,6 +232,7 @@ def main() -> int:
     provider_argument_limit_parity()
     required_memory_remember_fields()
     agentic_planning_fields()
+    runtime_backend_parity()
     compare(
         "message kinds",
         ("rust", rust_kinds()),
