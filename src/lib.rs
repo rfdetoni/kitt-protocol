@@ -23,6 +23,9 @@ pub use multillm::{
 mod semantic;
 pub use semantic::*;
 
+mod runtime;
+pub use runtime::*;
+
 pub const PROTOCOL_VERSION: u16 = 1;
 pub const MAX_FRAME_BYTES: usize = 1024 * 1024;
 

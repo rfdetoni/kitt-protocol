@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://kitt.local/schemas/agent-contract-v3.schema.json",
-  "title": "KITT Agent Contract v3",
+  "$id": "https://kitt.local/schemas/agent-contract-v5.schema.json",
+  "title": "KITT Agent Contract v5",
   "type": "object",
   "additionalProperties": false,
   "required": [

@@ -1,4 +1,5 @@
 export type { CortexEvent, CortexDelivery, CortexPreflight, CortexContextProjection, CortexRouteAdvice, CortexAutonomyTier, CortexPreflightDecision } from './cortex.js';
+export * from './runtime.js';
 export const PROTOCOL_VERSION = 1 as const;
 export { AGENT_CONTRACT_HEADER, AGENT_CONTRACT_VERSION, AGENT_WIRE_FORMAT, AGENT_ROUTE_HEADER, AGENT_RESPONSE_SCHEMA } from './agent-contract.js';
 export { MAX_TOOL_ARGUMENT_BYTES } from './provider-limits.js';
@@ -686,6 +687,15 @@ export interface PlanProposal { schema_version: 1; objective: string; tasks: Pla
 export interface SubagentReport {
   schema_version: 1; task_id: string; child_id: string; status: string;
   artifacts: string[]; evidence: string[]; blockers: string[];
+}
+
+export interface WorkerExecuteRequest {
+  capability: string;
+  payload: Record<string, unknown>;
+}
+
+export interface WorkerExecuteResponse {
+  payload: Record<string, unknown>;
 }
 
 export { CONTEXT_ENVELOPE_SCHEMA } from "./context-schema.js";

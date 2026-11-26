@@ -226,6 +226,38 @@ def kap2_limits_parity() -> None:
             fail(f"KAP/2 bounded constant mismatch: {p}/{t}")
 
 
+def runtime_capabilities_parity() -> None:
+    python_module = ast.parse(read("sdk/python/kitt_protocol/runtime.py"))
+    rust = read("src/runtime.rs")
+    ts = read("sdk/typescript/src/runtime.ts")
+    schema = json.loads(read("schemas/runtime-capabilities.schema.json"))["$defs"]
+    for name in (
+        "GpuDeviceDescriptor",
+        "GpuLeaseRecord",
+        "CompressionNegotiation",
+        "MountSourceSpec",
+        "WorkerCapabilities",
+        "SnapshotManifestV2",
+        "MigrationPlan",
+        "BenchmarkReport",
+    ):
+        cls = next(n for n in python_module.body if isinstance(n, ast.ClassDef) and n.name == name)
+        py_fields = {n.target.id for n in cls.body if isinstance(n, ast.AnnAssign) and isinstance(n.target, ast.Name)}
+        rust_block = re.search(rf"pub struct {name} \{{([^}}]+)\}}", rust).group(1)
+        ts_block = re.search(rf"export interface {name} \{{([^}}]+)\}}", ts).group(1)
+        compare(
+            name,
+            ("python", py_fields),
+            ("rust", set(re.findall(r"pub (\w+):", rust_block))),
+            ("typescript", set(re.findall(r"(\w+)\??\s*:", ts_block))),
+            ("schema", set(schema[name]["properties"])),
+        )
+    if "export interface WorkerExecuteRequest" not in read("sdk/typescript/src/index.ts"):
+        fail("TypeScript WorkerExecuteRequest missing")
+    if "export interface WorkerExecuteResponse" not in read("sdk/typescript/src/index.ts"):
+        fail("TypeScript WorkerExecuteResponse missing")
+
+
 def main() -> int:
     kap2_limits_parity()
     agent_response_parity()
@@ -233,6 +265,7 @@ def main() -> int:
     required_memory_remember_fields()
     agentic_planning_fields()
     runtime_backend_parity()
+    runtime_capabilities_parity()
     compare(
         "message kinds",
         ("rust", rust_kinds()),
