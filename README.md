@@ -1,6 +1,6 @@
 # K.I.T.T. Protocol
 
-Versão **0.14.3**. Contratos canônicos e SDKs Rust, Python e TypeScript. [Histórico de versões](CHANGELOG.md) · [Notas da versão anterior](docs/RELEASE_0.14.2.md).
+Versão **0.14.4**. Contratos canônicos e SDKs Rust, Python e TypeScript. [Histórico de versões](CHANGELOG.md) · [Notas da versão anterior](docs/RELEASE_0.14.2.md).
 
 ## Memory 0.9 additions
 
@@ -8,13 +8,6 @@ Versão **0.14.3**. Contratos canônicos e SDKs Rust, Python e TypeScript. [Hist
 - Progressive search adds optional `include_provenance`, `exclude_ids` and `include_context_hints`; timeline/get add optional provenance control.
 - Search responses can optionally include `context_hints` and `common` metadata when explicitly requested.
 - Existing search/timeline/get fields remain unchanged and Envelope protocol stays at **v1**.
-
-## Agentic 0.6 additions
-
-- `MemorySearchRequest` returns bounded snippets/candidates first; `MemoryGetRequest` hydrates selected records under its own budget; `MemoryTimelineRequest` provides source/session chronology without overloading semantic search.
-- `ToolExecutionReceipt` gives replay/reconnect a stable execution identity for side-effecting calls.
-- `ConversationRuntimeBinding` represents per-conversation LOCAL/DOCKER/PODMAN/KUBERNETES/REMOTE ownership without making a global environment variable authoritative.
-- `ContextSegmentReconciliation` records UNCHANGED/RECONCILED/REPLACED/INVALIDATED decisions between context epochs.
 
 ## Agentic 0.6 additions
 
