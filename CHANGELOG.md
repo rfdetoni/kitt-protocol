@@ -1,5 +1,9 @@
 # Changelog — K.I.T.T. Protocol
 
+## 0.14.3
+
+- Canonical runtime binding and execution receipt schemas, cross-SDK parity checks, Cortex contracts and CI dependency caching.
+
 ## 0.14.2 — Immutable release metadata and changelog consolidation
 
 Aligned Cargo, Python, TypeScript and npm/Cargo lock versions; retained existing Clean-Room and JSON Agent v5 behavior. Consolidated release notes outside README. [Detalhes](docs/RELEASE_0.14.2.md).
